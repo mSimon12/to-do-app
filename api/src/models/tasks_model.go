@@ -15,23 +15,22 @@ type Task struct {
 	Description string
 	Status      string
 	Priority    uint16
-	createdAt   time.Time
+	CreatedAt   time.Time
 	DueDate     time.Time
 }
 
-func CreateTask(newTask Task) {
+func CreateTask(newTask Task) uint16 {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
 	// Add new task to DB
-	createdAt := time.Now()
 	newTaskQuery := "INSERT INTO tasks (title, description, status, priority, created_at, due_date) VALUES ($1, $2, $3, $4, $5, $6);"
 	_, err := conn.Exec(context.Background(), newTaskQuery,
 		newTask.Title,
 		newTask.Description,
 		newTask.Status,
 		newTask.Priority,
-		createdAt,
+		newTask.CreatedAt,
 		newTask.DueDate,
 	)
 
@@ -39,6 +38,7 @@ func CreateTask(newTask Task) {
 		panic(err)
 	}
 
+	return 1
 }
 
 func QueryTask(taskId uint) {
@@ -50,7 +50,7 @@ func QueryTask(taskId uint) {
 		&queriedTask.Description,
 		&queriedTask.Status,
 		&queriedTask.Priority,
-		&queriedTask.createdAt,
+		&queriedTask.CreatedAt,
 		&queriedTask.DueDate)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
