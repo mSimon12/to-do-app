@@ -11,7 +11,7 @@ To be able to run this application, some initial procedures need to be proceeded
 With all the requirements ensured, we need to run a PostgreSQL container in docker, which will provide our application with a database server for storing the tasks list.
 
 ### Start database container
-To run the database container, create a file **.env** at [database](api/src/models/database/) folder following the *example.env* to configure the PostgreSQL database. Than run the following command to start the DB docker container in a detached mode:
+To configure the database container, create a file **.env** at [database](api/src/models/database/) folder following the *example.env* adn update the configuration for your PostgreSQL database. Than run the following command to start the DB docker container in a detached mode:
 ```
 sudo docker compose up -d
 ```
