@@ -3,29 +3,23 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"to-do-api/service"
 
 	"github.com/gin-gonic/gin"
 )
 
-type taskRequestBody struct {
-	Title       string `json:"title" binding:"required"`
-	Priority    int    `json:"priority"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	DueDate     string `json:"due_date"`
-}
-
 func createTask(c *gin.Context) {
-	var requestBody taskRequestBody
+	var requestBody service.TaskRequestBody
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		// Respond with error
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	// TODO:  Create new task and process possible errors
+	taskId := service.CreateNewTask(requestBody)
 
 	// Respond with success
-	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "task": requestBody})
+	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "taskId": taskId})
 }
 
 func getTasksList(c *gin.Context) {
