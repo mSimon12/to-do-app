@@ -68,7 +68,7 @@ func QueryTask(taskId uint) (Task, error) {
 	return queriedTask, err
 }
 
-func UpdateTask(updatedTask Task) {
+func UpdateTask(updatedTask Task) error {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
@@ -81,9 +81,8 @@ func UpdateTask(updatedTask Task) {
 		updatedTask.Priority,
 		updatedTask.DueDate,
 		updatedTask.Id)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-	}
+
+	return err
 }
 
 func DeleteTask(taskId uint) error {

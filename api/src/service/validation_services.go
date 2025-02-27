@@ -7,6 +7,21 @@ import (
 	"to-do-api/models"
 )
 
+func ValidateNewTaskInput(requestInput TaskRequestBody) error {
+	if requestInput.Title == nil {
+		return errors.New("missing required field: 'title'")
+	}
+	return nil
+}
+
+func ValidateUpdateTaskInput(requestInput TaskRequestBody) error {
+
+	if (TaskRequestBody{}) == requestInput {
+		return errors.New("at least one field must be present: 'title', 'description', 'priority', 'status, 'due_date'")
+	}
+	return nil
+}
+
 func ValidateTaskIdInput(taskIdString string) (uint, error) {
 	taskId, err := strconv.Atoi(taskIdString)
 	if err != nil {

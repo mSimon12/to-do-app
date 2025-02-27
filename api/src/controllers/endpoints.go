@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"to-do-api/service"
 
@@ -13,6 +12,11 @@ func createTask(c *gin.Context) {
 	var requestBody service.TaskRequestBody
 	var err error
 	if err = c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err = service.ValidateNewTaskInput(requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -57,10 +61,35 @@ func getTask(c *gin.Context) {
 }
 
 func updateTask(c *gin.Context) {
-	taskId := c.Param("taskId")
+	var err error
+	taskIdString := c.Param("taskId")
+	taskId, err := service.ValidateTaskIdInput(taskIdString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	fmt.Println(taskId)
-	// TODO: Update task and process possible errors
+	var requestBody service.TaskRequestBody
+	if err = c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err = service.ValidateUpdateTaskInput(requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err = service.UpdateTask(uint(taskId), requestBody); err != nil {
+		if errors.Is(err, service.ErrRowNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else if errors.Is(err, service.ErrDatabaseGeneral) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	// c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "taskId": taskId})
 
 	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
 }
