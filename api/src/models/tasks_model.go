@@ -95,3 +95,15 @@ func DeleteTask(taskId uint) error {
 
 	return err
 }
+
+func CheckExistence(taskId uint) (bool, error) {
+	conn := getDatabaseConnection()
+	defer conn.Close(context.Background())
+
+	// Delete task from DB
+
+	var idExist bool
+	err := conn.QueryRow(context.Background(), "SELECT EXISTS(SELECT * from tasks WHERE id=$1);", taskId).Scan(&idExist)
+
+	return idExist, err
+}

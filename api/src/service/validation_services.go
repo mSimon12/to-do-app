@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"to-do-api/models"
 )
 
-func ValidateTaskId(taskIdString string) (uint, error) {
+func ValidateTaskIdInput(taskIdString string) (uint, error) {
 	taskId, err := strconv.Atoi(taskIdString)
 	if err != nil {
 		fmt.Printf("failed in Id type conversion: %v\n", err)
@@ -15,4 +16,10 @@ func ValidateTaskId(taskIdString string) (uint, error) {
 
 	return uint(taskId), nil
 
+}
+
+func checkIdExist(taskId uint) bool {
+	validId, _ := models.CheckExistence(taskId)
+
+	return validId
 }

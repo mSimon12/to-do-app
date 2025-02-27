@@ -52,6 +52,12 @@ func CreateNewTask(task TaskRequestBody) (uint, error) {
 }
 
 func GetTaskById(taskId uint) (models.Task, error) {
+	var task models.Task
+
+	if !checkIdExist(taskId) {
+		return task, ErrRowNotFound
+	}
+
 	task, err := models.QueryTask(taskId)
 
 	if err != nil {
@@ -67,6 +73,10 @@ func GetTaskById(taskId uint) (models.Task, error) {
 }
 
 func DeleteTask(taskId uint) error {
+
+	if !checkIdExist(taskId) {
+		return ErrRowNotFound
+	}
 
 	err := models.DeleteTask(taskId)
 

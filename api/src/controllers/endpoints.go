@@ -36,7 +36,7 @@ func getTasksList(c *gin.Context) {
 
 func getTask(c *gin.Context) {
 	taskIdString := c.Param("taskId")
-	taskId, err := service.ValidateTaskId(taskIdString)
+	taskId, err := service.ValidateTaskIdInput(taskIdString)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -67,14 +67,18 @@ func updateTask(c *gin.Context) {
 
 func deleteTask(c *gin.Context) {
 	taskIdString := c.Param("taskId")
-	taskId, err := service.ValidateTaskId(taskIdString)
+	taskId, err := service.ValidateTaskIdInput(taskIdString)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err = service.DeleteTask(uint(taskId)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if errors.Is(err, service.ErrRowNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else if errors.Is(err, service.ErrDatabaseGeneral) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
