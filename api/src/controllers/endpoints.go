@@ -10,15 +10,18 @@ import (
 
 func createTask(c *gin.Context) {
 	var requestBody service.TaskRequestBody
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		// Respond with error
+	var err error
+	if err = c.ShouldBindJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// TODO:  Create new task and process possible errors
-	taskId := service.CreateNewTask(requestBody)
 
-	// Respond with success
+	var taskId uint16
+	if taskId, err = service.CreateNewTask(requestBody); err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "taskId": taskId})
 }
 

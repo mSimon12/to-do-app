@@ -19,26 +19,32 @@ type Task struct {
 	DueDate     time.Time
 }
 
-func CreateTask(newTask Task) uint16 {
+func AddTask(newTask Task) uint16 {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
-	// Add new task to DB
-	newTaskQuery := "INSERT INTO tasks (title, description, status, priority, created_at, due_date) VALUES ($1, $2, $3, $4, $5, $6);"
-	_, err := conn.Exec(context.Background(), newTaskQuery,
+	newTaskQuery := `
+		INSERT INTO tasks (title, description, status, priority, created_at, due_date) 
+		VALUES ($1, $2, $3, $4, $5, $6) 
+		RETURNING id;
+	`
+
+	var taskId uint16
+	err := conn.QueryRow(context.Background(), newTaskQuery,
 		newTask.Title,
 		newTask.Description,
 		newTask.Status,
 		newTask.Priority,
 		newTask.CreatedAt,
 		newTask.DueDate,
-	)
+	).Scan(&taskId)
 
 	if err != nil {
-		panic(err)
+		fmt.Printf("Insert Row failed: %v\n", err)
+		return 0 // Return 0 in case of failure
 	}
 
-	return 1
+	return taskId
 }
 
 func QueryTask(taskId uint) {
@@ -53,7 +59,7 @@ func QueryTask(taskId uint) {
 		&queriedTask.CreatedAt,
 		&queriedTask.DueDate)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+		fmt.Printf("QueryRow failed: %v\n", err)
 	}
 
 	fmt.Println(queriedTask)

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"time"
 	"to-do-api/models"
@@ -14,7 +15,7 @@ type TaskRequestBody struct {
 	DueDate     string `json:"due_date"`
 }
 
-func CreateNewTask(task TaskRequestBody) uint16 {
+func CreateNewTask(task TaskRequestBody) (uint16, error) {
 	newTask := models.Task{
 		Title:       task.Title,
 		Description: task.Description,
@@ -24,8 +25,13 @@ func CreateNewTask(task TaskRequestBody) uint16 {
 		DueDate:     dateStrToTime(task.DueDate),
 	}
 
-	newTaskId := models.CreateTask(newTask)
-	return newTaskId
+	newTaskId := models.AddTask(newTask)
+
+	if newTaskId == 0 {
+		return 0, errors.New("fail to add task to database")
+	}
+
+	return newTaskId, nil
 }
 
 func dateStrToTime(date string) time.Time {
