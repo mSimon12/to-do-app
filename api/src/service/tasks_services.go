@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -14,6 +15,9 @@ type TaskRequestBody struct {
 	Status      string `json:"status"`
 	DueDate     string `json:"due_date"`
 }
+
+var ErrDatabaseGeneral = errors.New("fail processing request on database")
+var ErrRowNotFound = errors.New("requested resource not found on database")
 
 func dateStrToTime(date string) time.Time {
 	layout := "2006-01-22"
@@ -40,10 +44,26 @@ func CreateNewTask(task TaskRequestBody) (uint, error) {
 	newTaskId, err := models.AddTask(newTask)
 
 	if err != nil {
-		return 0, errors.New("fail to add task to database")
+		fmt.Printf("Create Task failed: %v\n", err)
+		return 0, ErrDatabaseGeneral
 	}
 
 	return newTaskId, nil
+}
+
+func GetTaskById(taskId uint) (models.Task, error) {
+	task, err := models.QueryTask(taskId)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return task, ErrRowNotFound
+		} else {
+			fmt.Printf("Get Task failed: %v\n", err)
+			return task, ErrDatabaseGeneral
+		}
+	}
+
+	return task, nil
 }
 
 func DeleteTask(taskId uint) error {
@@ -51,7 +71,8 @@ func DeleteTask(taskId uint) error {
 	err := models.DeleteTask(taskId)
 
 	if err != nil {
-		return errors.New("fail to delete task from database")
+		fmt.Printf("Delete Task failed: %v\n", err)
+		return ErrDatabaseGeneral
 	}
 
 	return nil

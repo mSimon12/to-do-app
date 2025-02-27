@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"to-do-api/service"
@@ -34,11 +35,25 @@ func getTasksList(c *gin.Context) {
 }
 
 func getTask(c *gin.Context) {
-	taskId := c.Param("taskId")
+	taskIdString := c.Param("taskId")
+	taskId, err := service.ValidateTaskId(taskIdString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	// TODO: Get task and process possible errors
+	task, err := service.GetTaskById(taskId)
+	if err != nil {
+		if errors.Is(err, service.ErrRowNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else if errors.Is(err, service.ErrDatabaseGeneral) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task queried successfully", "task": taskId})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Task queried successfully", "task": task})
 }
 
 func updateTask(c *gin.Context) {
@@ -52,7 +67,6 @@ func updateTask(c *gin.Context) {
 
 func deleteTask(c *gin.Context) {
 	taskIdString := c.Param("taskId")
-
 	taskId, err := service.ValidateTaskId(taskIdString)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

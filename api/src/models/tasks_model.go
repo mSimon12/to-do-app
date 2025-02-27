@@ -51,22 +51,21 @@ func AddTask(newTask Task) (uint, error) {
 	return taskId, err
 }
 
-func QueryTask(taskId uint) {
+func QueryTask(taskId uint) (Task, error) {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
 	var queriedTask Task
-	err := conn.QueryRow(context.Background(), "SELECT * FROM tasks WHERE id=$1;", taskId).Scan(&queriedTask.Id, &queriedTask.Title,
+	err := conn.QueryRow(context.Background(), "SELECT * FROM tasks WHERE id=$1;", taskId).Scan(
+		&queriedTask.Id,
+		&queriedTask.Title,
 		&queriedTask.Description,
 		&queriedTask.Status,
 		&queriedTask.Priority,
 		&queriedTask.CreatedAt,
 		&queriedTask.DueDate)
-	if err != nil {
-		fmt.Printf("QueryRow failed: %v\n", err)
-	}
 
-	fmt.Println(queriedTask)
+	return queriedTask, err
 }
 
 func UpdateTask(updatedTask Task) {
