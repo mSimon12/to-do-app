@@ -19,7 +19,16 @@ type Task struct {
 	DueDate     time.Time
 }
 
-func AddTask(newTask Task) uint16 {
+func getDatabaseConnection() *pgx.Conn {
+	conn, err := pgx.Connect(context.Background(), getDatabaseUrl())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	return conn
+}
+
+func AddTask(newTask Task) (uint, error) {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
@@ -29,7 +38,7 @@ func AddTask(newTask Task) uint16 {
 		RETURNING id;
 	`
 
-	var taskId uint16
+	var taskId uint
 	err := conn.QueryRow(context.Background(), newTaskQuery,
 		newTask.Title,
 		newTask.Description,
@@ -39,12 +48,7 @@ func AddTask(newTask Task) uint16 {
 		newTask.DueDate,
 	).Scan(&taskId)
 
-	if err != nil {
-		fmt.Printf("Insert Row failed: %v\n", err)
-		return 0 // Return 0 in case of failure
-	}
-
-	return taskId
+	return taskId, err
 }
 
 func QueryTask(taskId uint) {
@@ -69,7 +73,7 @@ func UpdateTask(updatedTask Task) {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
-	// update task from DB
+	// Update task from DB
 	newTaskQuery := "UPDATE tasks SET title = $1, description= $2, status= $3, priority= $4, due_date= $5 WHERE id = $6;"
 	_, err := conn.Exec(context.Background(), newTaskQuery,
 		updatedTask.Title,
@@ -83,24 +87,12 @@ func UpdateTask(updatedTask Task) {
 	}
 }
 
-func DeleteTask(taskId uint) {
+func DeleteTask(taskId uint) error {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
 	// Delete task from DB
 	_, err := conn.Exec(context.Background(), "DELETE FROM tasks WHERE id=$1;", taskId)
 
-	if err != nil {
-		panic(err)
-	}
-
-}
-
-func getDatabaseConnection() *pgx.Conn {
-	conn, err := pgx.Connect(context.Background(), getDatabaseUrl())
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
-	return conn
+	return err
 }

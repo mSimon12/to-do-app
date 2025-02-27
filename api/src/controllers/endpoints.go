@@ -16,9 +16,9 @@ func createTask(c *gin.Context) {
 		return
 	}
 
-	var taskId uint16
+	var taskId uint
 	if taskId, err = service.CreateNewTask(requestBody); err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -51,10 +51,18 @@ func updateTask(c *gin.Context) {
 }
 
 func deleteTask(c *gin.Context) {
-	taskId := c.Param("taskId")
+	taskIdString := c.Param("taskId")
 
-	fmt.Println(taskId)
-	// TODO: Delete task and process possible errors
+	taskId, err := service.ValidateTaskId(taskIdString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err = service.DeleteTask(uint(taskId)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
 
