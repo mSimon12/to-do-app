@@ -6,6 +6,8 @@ The Rest API implemented for this To-Do application follows the Controller-Servi
 ## Controller
 Provides the entrypoints for the RestAPI, and is responsible in forwarding the requests for the right services and to ensure the input and output patterns are in the right format.
 
+The API provides endpoints for creating new tasks, consulting ordered list by desired criteria and filter items by match. Also, other 3 task endpoints allow consulting, updating and deleting specific tasks. 
+
 ## Service
 Layer where the business logic is implemented. All the manipulation of data from database must be done in this layer before forwarded to the client, ensuring the request will be accomplished according expected logic defined by the business.
 
@@ -39,3 +41,27 @@ models.UpdateTask(updateTask)
 models.DeleteTask(2)
 
 ```
+
+# Roadmap
+The steps done to get to the current status of this project and the planned sequence for the development of this Rest API are listed below: 
+
+### MVP
+- [x] Initialize database.
+- [x] Implement basic endpoints:
+	- [x] Task Create.
+	- [x] Task Consult, Update and Delete.
+	- [x] List ordered tasks by desired criteria.
+- [ ] Implement pagination to list tasks request.
+- [ ] Provide match filter functionality.
+- [ ] Implement tests.
+- [ ] Add simple CI/CD.
+- [ ] Deploy application on GCP.
+
+
+### Extra
+- [ ] Add dependencies model.
+- [ ] Get order execution for ensuring dependencies.
+
+
+
+
