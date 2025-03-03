@@ -31,9 +31,31 @@ func createTask(c *gin.Context) {
 }
 
 func getTasksList(c *gin.Context) {
-	tasks := map[uint]string{1: "task 1", 2: "task 2"}
+	// tasks := map[uint]string{1: "task 1", 2: "task 2"}
 
 	// TODO: Get tasks list and process possible errors
+	type taskListRequestBody struct {
+		Filter *string `json:"filter"`
+	}
+
+	var requestBody taskListRequestBody
+	c.ShouldBindJSON(&requestBody)
+	filter := ""
+	if requestBody.Filter != nil {
+		filter = *requestBody.Filter
+	}
+
+	tasks, err := service.GetTasksList(filter)
+
+	if err != nil {
+		if errors.Is(err, service.ErrRowNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else if errors.Is(err, service.ErrDatabaseGeneral) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Tasks queried successfully", "tasks": tasks})
 }
