@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"to-do-api/service"
 
@@ -28,34 +29,6 @@ func createTask(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "taskId": taskId})
-}
-
-func getTasksList(c *gin.Context) {
-	offset := c.Query("offset")
-	limit := c.Query("limit")
-	sortBy := c.Query("sort_by")
-	sortOrder := c.Query("sort_order")
-
-	pageConfig, err := service.CreatePageConfig(offset, limit, sortBy, sortOrder)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	tasks, err := service.GetTasksList(pageConfig)
-
-	if err != nil {
-		if errors.Is(err, service.ErrRowNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		} else if errors.Is(err, service.ErrDatabaseGeneral) {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		}
-
-		return
-	}
-
-	pagination, sorting := service.GetReturnInfo(pageConfig)
-	c.JSON(http.StatusOK, gin.H{"message": "Tasks queried successfully", "data": tasks, "pagination": pagination, "sorting": sorting})
 }
 
 func getTask(c *gin.Context) {
@@ -133,4 +106,48 @@ func deleteTask(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
 
+}
+
+// Endpoint for querying tasks list
+func getTasksList(c *gin.Context) {
+
+	// Filtering
+	titleFilter := c.Query("title_contains")
+	descriptionFilter := c.Query("description_contains")
+	statusFilter := c.Query("status")
+	priorityFilter := c.Query("priority")
+
+	filtersConfig, err := service.CreateFilterConfig(titleFilter, descriptionFilter, statusFilter, priorityFilter)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Println(filtersConfig)
+
+	// Pagination
+	offset := c.Query("offset")
+	limit := c.Query("limit")
+	sortBy := c.Query("sort_by")
+	sortOrder := c.Query("sort_order")
+
+	pageConfig, err := service.CreatePageConfig(offset, limit, sortBy, sortOrder)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	tasks, err := service.GetTasksList(filtersConfig, pageConfig)
+
+	if err != nil {
+		if errors.Is(err, service.ErrRowNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else if errors.Is(err, service.ErrDatabaseGeneral) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+
+		return
+	}
+
+	pagination, sorting := service.GetReturnInfo(pageConfig)
+	c.JSON(http.StatusOK, gin.H{"message": "Tasks queried successfully", "data": tasks, "pagination": pagination, "sorting": sorting})
 }

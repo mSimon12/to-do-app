@@ -4,29 +4,51 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 )
 
-type TasksListQuery struct {
+type TasksPaginationQuery struct {
 	Offset    uint
 	SortBy    string
 	SortOrder string
 	Limit     uint
 }
 
-func QueryTasks(queryConfig TasksListQuery) ([]Task, error) {
+type TasksFilterQuery struct {
+	Query string // columns
+	Value string // searched value
+}
+
+func QueryTasks(filterConfig []TasksFilterQuery, pageConfig TasksPaginationQuery) ([]Task, error) {
 	conn := getDatabaseConnection()
 	defer conn.Close(context.Background())
 
-	// taskQuery := fmt.Sprintf("SELECT * FROM tasks ORDER BY %s ASC;", orderBy)
-	taskQuery := fmt.Sprintf("SELECT * FROM tasks ORDER BY %s %s LIMIT %d OFFSET %d;",
-		queryConfig.SortBy,
-		queryConfig.SortOrder,
-		queryConfig.Limit,
-		queryConfig.Offset)
+	var queryBuilder strings.Builder
+	var queryParams []interface{} // Slice to store query values
 
+	queryBuilder.WriteString("SELECT * FROM tasks")
+
+	filterElements := len(filterConfig)
+	if filterElements > 0 {
+		queryBuilder.WriteString(" WHERE ")
+	}
+
+	for filter_idx, filter := range filterConfig {
+		if filter_idx > 0 {
+			queryBuilder.WriteString(" AND ")
+		}
+		queryBuilder.WriteString(filter.Query)
+		queryParams = append(queryParams, filter.Value)
+	}
+
+	paginationQuery := fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d;", pageConfig.SortBy, pageConfig.SortOrder, filterElements+1, filterElements+2)
+	queryBuilder.WriteString(paginationQuery)
+	queryParams = append(queryParams, pageConfig.Limit, pageConfig.Offset) // Add limit and offset
+
+	taskQuery := queryBuilder.String()
 	fmt.Println(taskQuery)
 
-	rows, err := conn.Query(context.Background(), taskQuery)
+	rows, err := conn.Query(context.Background(), taskQuery, queryParams...)
 	tasks := []Task{}
 
 	if err != nil {
