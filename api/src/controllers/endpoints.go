@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"to-do-api/service"
 
@@ -122,7 +121,6 @@ func getTasksList(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(filtersConfig)
 
 	// Pagination
 	offset := c.Query("offset")
