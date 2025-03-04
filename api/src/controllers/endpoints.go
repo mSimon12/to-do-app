@@ -31,21 +31,18 @@ func createTask(c *gin.Context) {
 }
 
 func getTasksList(c *gin.Context) {
-	// tasks := map[uint]string{1: "task 1", 2: "task 2"}
+	offset := c.Query("offset")
+	limit := c.Query("limit")
+	sortBy := c.Query("sort_by")
+	sortOrder := c.Query("sort_order")
 
-	// TODO: Get tasks list and process possible errors
-	type taskListRequestBody struct {
-		Filter *string `json:"filter"`
+	pageConfig, err := service.CreatePageConfig(offset, limit, sortBy, sortOrder)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	var requestBody taskListRequestBody
-	c.ShouldBindJSON(&requestBody)
-	filter := ""
-	if requestBody.Filter != nil {
-		filter = *requestBody.Filter
-	}
-
-	tasks, err := service.GetTasksList(filter)
+	tasks, err := service.GetTasksList(pageConfig)
 
 	if err != nil {
 		if errors.Is(err, service.ErrRowNotFound) {
@@ -57,7 +54,8 @@ func getTasksList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Tasks queried successfully", "tasks": tasks})
+	pagination, sorting := service.GetReturnInfo(pageConfig)
+	c.JSON(http.StatusOK, gin.H{"message": "Tasks queried successfully", "data": tasks, "pagination": pagination, "sorting": sorting})
 }
 
 func getTask(c *gin.Context) {
