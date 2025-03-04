@@ -51,8 +51,8 @@ The steps done to get to the current status of this project and the planned sequ
 	- [x] Task Create.
 	- [x] Task Consult, Update and Delete.
 	- [x] List ordered tasks by desired criteria.
-- [ ] Implement pagination to list tasks request.
-- [ ] Provide match filter functionality.
+- [x] Implement pagination to list tasks request.
+- [x] Provide match filter functionality.
 - [ ] Implement tests.
 - [ ] Add simple CI/CD.
 - [ ] Deploy application on GCP.
