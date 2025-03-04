@@ -55,15 +55,27 @@ func CreateFilterConfig(titleFilter string, descriptionFilter string, statusFilt
 	filterConfig := []models.TasksFilterQuery{}
 
 	if titleFilter != "" {
+		if !isValidTextFilter(titleFilter) {
+			return nil, errors.New("invalid title filter: must be alphanumeric")
+		}
 		filterConfig = appendFilter(filterConfig, "title", titleFilter)
 	}
 	if descriptionFilter != "" {
+		if !isValidTextFilter(descriptionFilter) {
+			return nil, errors.New("invalid description filter: must be alphanumeric")
+		}
 		filterConfig = appendFilter(filterConfig, "description", descriptionFilter)
 	}
 	if statusFilter != "" {
+		if !isValidTextFilter(statusFilter) {
+			return nil, errors.New("invalid status filter: must be alphanumeric")
+		}
 		filterConfig = appendFilter(filterConfig, "status", statusFilter)
 	}
 	if priorityFilter != "" {
+		if !isValidPriorityFilter(priorityFilter) {
+			return nil, errors.New("invalid priority filter: must be positive integer")
+		}
 		filterConfig = appendFilter(filterConfig, "priority", priorityFilter)
 	}
 

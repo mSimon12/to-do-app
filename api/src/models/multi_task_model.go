@@ -28,6 +28,7 @@ func QueryTasks(filterConfig []TasksFilterQuery, pageConfig TasksPaginationQuery
 
 	queryBuilder.WriteString("SELECT * FROM tasks")
 
+	// Add filter queries
 	filterElements := len(filterConfig)
 	if filterElements > 0 {
 		queryBuilder.WriteString(" WHERE ")
@@ -41,12 +42,12 @@ func QueryTasks(filterConfig []TasksFilterQuery, pageConfig TasksPaginationQuery
 		queryParams = append(queryParams, filter.Value)
 	}
 
+	// Add pagination query
 	paginationQuery := fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d;", pageConfig.SortBy, pageConfig.SortOrder, filterElements+1, filterElements+2)
 	queryBuilder.WriteString(paginationQuery)
 	queryParams = append(queryParams, pageConfig.Limit, pageConfig.Offset) // Add limit and offset
 
 	taskQuery := queryBuilder.String()
-	fmt.Println(taskQuery)
 
 	rows, err := conn.Query(context.Background(), taskQuery, queryParams...)
 	tasks := []Task{}

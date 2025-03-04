@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -59,4 +60,18 @@ func isValidSortCriteria(criteria string) bool {
 func isValidSortOrder(order string) bool {
 	validOrder := []string{"asc", "desc"}
 	return slices.Contains(validOrder, strings.ToLower(order))
+}
+
+// Ensures only letters, numbers, spaces, and basic punctuation
+func isValidTextFilter(input string) bool {
+	re := regexp.MustCompile(`^[a-zA-Z0-9\s.,!?-]+$`)
+	return re.MatchString(input)
+}
+
+func isValidPriorityFilter(input string) bool {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return false
+	}
+	return value >= 0
 }
