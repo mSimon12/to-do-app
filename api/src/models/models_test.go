@@ -17,7 +17,7 @@ func setMockConnection() pgxmock.PgxPoolIface {
 	return mockConn
 }
 
-func TestAddTaskPattern(t *testing.T) {
+func TestAddTask(t *testing.T) {
 	mockConn := setMockConnection()
 	defer mockConn.Close()
 
@@ -44,6 +44,43 @@ func TestAddTaskPattern(t *testing.T) {
 	// Assertions
 	assert.NoError(t, err, fmt.Sprintf("Unexpected error from function - err: %v", err))
 	assert.Equal(t, uint(1), taskID, "Returned value should be 1")
+	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
+}
+
+func TestQueryTask(t *testing.T) {
+	mockConn := setMockConnection()
+	defer mockConn.Close()
+
+	// Define test task
+	testId := uint(1)
+	testTitle := "Unit Test Task"
+	testDescription := "Mocked DB test"
+	testStatus := "pending"
+	testPriority := uint16(5)
+
+	layout := "2006-01-02"
+	testCreatedAt, _ := time.Parse(layout, "2025-02-03")
+	testDueDate, _ := time.Parse(layout, "2025-02-10")
+
+	// Set SQL mock expectation
+	expectedQuery := "SELECT \\* FROM tasks WHERE id=\\$1;"
+	mockConn.ExpectQuery(expectedQuery).
+		WithArgs(testId).
+		WillReturnRows(pgxmock.NewRows([]string{"id", "title", "description", "status", "priority", "created_at", "due_date"}).AddRow(
+			testId, testTitle, testDescription, testStatus, testPriority, testCreatedAt, testDueDate))
+
+	// Run function
+	queriedTask, err := QueryTask(testId)
+
+	// Assertions
+	assert.NoError(t, err, fmt.Sprintf("Unexpected error from function - err: %v", err))
+	assert.Equal(t, testId, queriedTask.Id, "Returned Id should be 1")
+	assert.Equal(t, testTitle, queriedTask.Title, "Returned Title should be 'Unit Test Task'")
+	assert.Equal(t, testDescription, queriedTask.Description, "Returned Description should be 'Mocked DB test'")
+	assert.Equal(t, testStatus, queriedTask.Status, "Returned Status should be 'pending'")
+	assert.Equal(t, testPriority, queriedTask.Priority, "Returned Priority should be 5")
+	assert.Equal(t, testCreatedAt, queriedTask.CreatedAt, "Returned createdAT should be '2025-02-03'")
+	assert.Equal(t, testDueDate, queriedTask.DueDate, "Returned dueDate should be '2025-02-10'")
 	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
 }
 
