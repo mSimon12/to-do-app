@@ -64,7 +64,7 @@ func isValidSortOrder(order string) bool {
 
 // Ensures only letters, numbers, spaces, and basic punctuation
 func isValidTextFilter(input string) bool {
-	re := regexp.MustCompile(`^[a-zA-Z0-9\s.,!?-]+$`)
+	re := regexp.MustCompile(`^[a-zA-Z0-9\s.,!?-_]+$`)
 	return re.MatchString(input)
 }
 
