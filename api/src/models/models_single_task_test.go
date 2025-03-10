@@ -17,6 +17,7 @@ func setMockConnection() pgxmock.PgxPoolIface {
 	return mockConn
 }
 
+// Single Tasks Tests ///////////////////////////////////
 func TestAddTask(t *testing.T) {
 	mockConn := setMockConnection()
 	defer mockConn.Close()
