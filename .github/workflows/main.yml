@@ -18,14 +18,11 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Display Go version
         run: go version
+      - run: cd api/src
       - name: Install dependencies
-        run: | 
-          cd api/src
-          go get .
+        run: go get .
       - name: Build
-        run: |
-          ls
-          go build -v ./...
+        run: go build -v ./...
 
   test:
 
@@ -42,10 +39,9 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Display Go version
         run: go version
+      - run: cd api/src
       - name: Install dependencies
-        run: | 
-          cd api/src
-          go get .
+        run: go get .
       - name: Test with Go
         run: go test -json > TestResults-${{ matrix.go-version }}.json
       - name: Upload Go test results
