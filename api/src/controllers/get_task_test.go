@@ -53,8 +53,8 @@ func TestGetTask(t *testing.T) {
 			"Description": expectedTask.Description,
 			"Status":      expectedTask.Status,
 			"Priority":    expectedTask.Priority,
-			"CreatedAt":   expectedTask.CreatedAt.Format("2006-01-02T15:04:05.999999999-07:00"), // Ensure consistent format
-			"DueDate":     expectedTask.DueDate.Format("2006-01-02T15:04:05.999999999-07:00"),
+			"CreatedAt":   expectedTask.CreatedAt.Format("2006-01-02T15:04:05.999999999Z"), // Ensure consistent format
+			"DueDate":     expectedTask.DueDate.Format("2006-01-02T15:04:05.999999999Z"),
 		},
 	}
 
