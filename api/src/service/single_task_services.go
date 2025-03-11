@@ -58,11 +58,14 @@ func CreateNewTask(task TaskRequestBody) (uint, error) {
 func GetTaskById(taskId uint) (models.Task, error) {
 	var task models.Task
 
-	if !checkIdExist(taskId) {
+	idExist, err := checkIdExist(taskId)
+	if !idExist {
 		return task, ErrRowNotFound
+	} else if err != nil {
+		return task, ErrDatabaseGeneral
 	}
 
-	task, err := models.QueryTask(taskId)
+	task, err = models.QueryTask(taskId)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -119,11 +122,14 @@ func UpdateTask(taskId uint, task TaskRequestBody) error {
 
 func DeleteTask(taskId uint) error {
 
-	if !checkIdExist(taskId) {
+	idExist, err := checkIdExist(taskId)
+	if !idExist {
 		return ErrRowNotFound
+	} else if err != nil {
+		return ErrDatabaseGeneral
 	}
 
-	err := models.DeleteTask(taskId)
+	err = models.DeleteTask(taskId)
 	if err != nil {
 		fmt.Printf("Delete Task failed: %v\n", err)
 		return ErrDatabaseGeneral
