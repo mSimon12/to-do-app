@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-  
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,7 +20,9 @@ jobs:
       - name: Display Go version
         run: go version
       - name: Install dependencies
-        run: go get .
+        run: | 
+          cd api/src
+          go get .
       - name: Build
         run: go build -v ./...
 
@@ -41,7 +43,9 @@ jobs:
       - name: Display Go version
         run: go version
       - name: Install dependencies
-        run: go get .
+        run: | 
+          cd api/src
+          go get .
       - name: Test with Go
         run: go test -json > TestResults-${{ matrix.go-version }}.json
       - name: Upload Go test results
