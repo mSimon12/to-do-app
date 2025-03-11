@@ -9,12 +9,14 @@ jobs:
     strategy:
       matrix:
         go-version: [ '1.24.x' ]
+    defaults:
+      run:
+          working-directory: ./api/src
 
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
-        working-directory: ./api/src
         with:
           go-version: ${{ matrix.go-version }}
       - name: Display Go version
@@ -35,7 +37,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
-        working-directory: ./api/src
         with:
           go-version: ${{ matrix.go-version }}
       - name: Display Go version
