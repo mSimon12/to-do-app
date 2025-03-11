@@ -81,8 +81,6 @@ func updateTask(c *gin.Context) {
 		return
 	}
 
-	// c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "taskId": taskId})
-
 	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
 }
 
