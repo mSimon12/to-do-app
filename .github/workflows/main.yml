@@ -16,7 +16,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: api/src/go.sum
       - name: Display Go version
         run: go version
       - name: Install dependencies
@@ -24,7 +23,9 @@ jobs:
           cd api/src
           go get .
       - name: Build
-        run: go build -v ./...
+        run: |
+          ls
+          go build -v ./...
 
   test:
 
@@ -39,7 +40,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: api/src/go.sum
       - name: Display Go version
         run: go version
       - name: Install dependencies
