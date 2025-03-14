@@ -21,7 +21,7 @@ type TasksFilterQuery struct {
 
 func QueryTasks(filterConfig []TasksFilterQuery, pageConfig TasksPaginationQuery) ([]Task, error) {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	var queryBuilder strings.Builder
 	var queryParams []interface{} // Slice to store query values
@@ -77,7 +77,7 @@ func QueryTasks(filterConfig []TasksFilterQuery, pageConfig TasksPaginationQuery
 
 func GetAmountOfTasks() (uint, error) {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	var tableSize uint
 	err := conn.QueryRow(context.Background(), "SELECT COUNT(*) FROM tasks;").Scan(&tableSize)

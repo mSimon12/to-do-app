@@ -2,11 +2,7 @@ package models
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"time"
-
-	"github.com/jackc/pgx/v5"
 )
 
 type Task struct {
@@ -19,18 +15,9 @@ type Task struct {
 	DueDate     time.Time
 }
 
-func getDatabaseConnection() *pgx.Conn {
-	conn, err := pgx.Connect(context.Background(), getDatabaseUrl())
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
-	return conn
-}
-
 func AddTask(newTask Task) (uint, error) {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	newTaskQuery := `
 		INSERT INTO tasks (title, description, status, priority, created_at, due_date) 
@@ -53,7 +40,7 @@ func AddTask(newTask Task) (uint, error) {
 
 func QueryTask(taskId uint) (Task, error) {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	var queriedTask Task
 	err := conn.QueryRow(context.Background(), "SELECT * FROM tasks WHERE id=$1;", taskId).Scan(
@@ -70,7 +57,7 @@ func QueryTask(taskId uint) (Task, error) {
 
 func UpdateTask(updatedTask Task) error {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	// Update task from DB
 	newTaskQuery := "UPDATE tasks SET title = $1, description= $2, status= $3, priority= $4, due_date= $5 WHERE id = $6;"
@@ -87,7 +74,7 @@ func UpdateTask(updatedTask Task) error {
 
 func DeleteTask(taskId uint) error {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	// Delete task from DB
 	_, err := conn.Exec(context.Background(), "DELETE FROM tasks WHERE id=$1;", taskId)
@@ -97,7 +84,7 @@ func DeleteTask(taskId uint) error {
 
 func CheckExistence(taskId uint) (bool, error) {
 	conn := getDatabaseConnection()
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	// Delete task from DB
 

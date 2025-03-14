@@ -15,7 +15,10 @@ var validSortCriteria []string = []string{"id", "title", "status", "priority", "
 func ValidateNewTaskInput(requestInput TaskRequestBody) error {
 	if requestInput.Title == nil {
 		return errors.New("missing required field: 'title'")
+	} else if *requestInput.Title == "" {
+		return errors.New("title must not be empty")
 	}
+
 	return nil
 }
 
@@ -29,7 +32,7 @@ func ValidateUpdateTaskInput(requestInput TaskRequestBody) error {
 
 func ValidateTaskIdInput(taskIdString string) (uint, error) {
 	taskId, err := strconv.Atoi(taskIdString)
-	if err != nil {
+	if err != nil || taskId < 0 {
 		fmt.Printf("failed in Id type conversion: %v\n", err)
 		return 0, errors.New("invalid task id")
 	}
@@ -38,10 +41,13 @@ func ValidateTaskIdInput(taskIdString string) (uint, error) {
 
 }
 
-func checkIdExist(taskId uint) bool {
-	validId, _ := models.CheckExistence(taskId)
+func checkIdExist(taskId uint) (bool, error) {
+	validId, err := models.CheckExistence(taskId)
+	if err != nil {
+		return false, ErrDatabaseGeneral
+	}
 
-	return validId
+	return validId, err
 }
 
 func isValidPageConfig(strConfig string) (uint, bool) {
@@ -64,7 +70,7 @@ func isValidSortOrder(order string) bool {
 
 // Ensures only letters, numbers, spaces, and basic punctuation
 func isValidTextFilter(input string) bool {
-	re := regexp.MustCompile(`^[a-zA-Z0-9\s.,!?-]+$`)
+	re := regexp.MustCompile(`^[a-zA-Z0-9\s.,!?_-]+$`)
 	return re.MatchString(input)
 }
 
