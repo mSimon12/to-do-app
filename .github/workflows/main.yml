@@ -78,7 +78,11 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: Check env access
-        run: echo ${{ env.POSTGRES_DB }}
+        run: | 
+          echo ${{ vars.POSTGRES_DB }}
+          echo ${{ vars.POSTGRES_HOST }}
+          echo ${{ vars.POSTGRES_PASSWORD }}
+          echo ${{ vars.POSTGRES_USER }}
 
       # - name: Configure Docker
       #   run: |
