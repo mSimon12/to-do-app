@@ -1,11 +1,17 @@
 name: Build and Deploy to Cloud Run
 
+env:
+  DOCKER_IMAGE_DB_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/to-do-app-db:latest"
+  DOCKER_IMAGE_APP_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/to-do-app:latest"
+
 on: [push]
 # on:
 #   push:
 #     branches:
 #       - main
 #       - stg
+
+
 
 jobs:
   deploy:
@@ -37,5 +43,11 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" >> api/deploy/.env
         docker compose -f api/deploy/docker-compose.yml up -d --build
+        docker tag to_do_app_db ${{ env.DOCKER_IMAGE_DB_URL }}
+        docker tag to_do_app ${{ env.DOCKER_IMAGE_APP_URL }}
         docker ps
 
+    - name: Push Docker images
+      run: |
+        docker push ${{ env.DOCKER_IMAGE_DB_URL }}
+        docker push ${{ env.DOCKER_IMAGE_APP_URL }}
