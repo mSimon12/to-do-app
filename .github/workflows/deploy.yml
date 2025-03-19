@@ -45,9 +45,10 @@ jobs:
         docker compose -f api/deploy/docker-compose.yml up -d --build
         docker tag postgres ${{ env.DOCKER_IMAGE_DB_URL }}
         docker tag to_do_app_image ${{ env.DOCKER_IMAGE_APP_URL }}
-        docker ps
+        docker image list
 
-    - name: Push Docker images
-      run: |
-        docker push ${{ env.DOCKER_IMAGE_DB_URL }}
-        docker push ${{ env.DOCKER_IMAGE_APP_URL }}
+    - name: Push Database Docker image
+      run: docker push ${{ env.DOCKER_IMAGE_DB_URL }}
+
+    - name: Push App Docker image
+      run: docker push ${{ env.DOCKER_IMAGE_APP_URL }}
