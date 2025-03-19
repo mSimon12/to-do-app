@@ -1,8 +1,8 @@
 name: Build and Deploy to Cloud Run
 
 env:
-  DOCKER_IMAGE_DB_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/to-do-app-db:latest"
-  DOCKER_IMAGE_APP_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/to-do-app:latest"
+  DOCKER_IMAGE_DB_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/deploy-images/to-do-app-db:latest"
+  DOCKER_IMAGE_APP_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/deploy-images/to-do-app:latest"
 
 on: [push]
 # on:
