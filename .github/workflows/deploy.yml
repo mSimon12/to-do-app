@@ -43,8 +43,8 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" >> api/deploy/.env
         docker compose -f api/deploy/docker-compose.yml up -d --build
-        docker tag to_do_app_db ${{ env.DOCKER_IMAGE_DB_URL }}
-        docker tag to_do_app ${{ env.DOCKER_IMAGE_APP_URL }}
+        docker tag postgres ${{ env.DOCKER_IMAGE_DB_URL }}
+        docker tag to_do_app_image ${{ env.DOCKER_IMAGE_APP_URL }}
         docker ps
 
     - name: Push Docker images
