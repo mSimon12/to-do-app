@@ -35,6 +35,7 @@ jobs:
 
     - name: Build Docker images
       run: |
+        echo "${{ secrets.ENV_FILE }}" >> api/deploy/.env
         docker compose -f api/deploy/docker-compose.yml up -d --build
         docker ps
 
