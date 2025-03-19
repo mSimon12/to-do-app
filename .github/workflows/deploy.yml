@@ -1,0 +1,40 @@
+name: Build and Deploy to Cloud Run
+
+on: [push]
+# on:
+#   push:
+#     branches:
+#       - main
+#       - stg
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Clones the repository into the workflow’s runner environment.
+    - name: Checkout code
+      uses: actions/checkout@v3     
+
+    # Enables the workflow to execute Google Cloud CLI commands
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        project_id: ${{ secrets.PROJECT_ID }}
+
+    # Install and configure the Google Cloud SDK (gcloud)
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1   
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Configure Docker to use gcloud as a credential helper
+      run: |
+        gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev
+
+    - name: Build Docker images
+      run: |
+        docker compose -f docker-compose.yml up -d --build
+        docker ps
+
