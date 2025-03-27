@@ -70,5 +70,4 @@ jobs:
           --port 5432 \
           --memory 512Mi \
           --cpu 1 \
-          --max-instances 1 \
-          --project ${{ secrets.GCP_PROJECT_ID  }}
+          --max-instances 1
