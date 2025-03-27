@@ -38,6 +38,7 @@ jobs:
     - name: Configure Docker to use gcloud as a credential helper
       run: |
         gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev
+        gcloud auth print-access-token | sudo docker login -u oauth2accesstoken --password-stdin https://${{ secrets.GCP_LOCATION }}-docker.pkg.dev
 
     - name: Build Docker images
       run: |
@@ -52,3 +53,19 @@ jobs:
 
     - name: Push App Docker image
       run: docker push ${{ env.DOCKER_IMAGE_APP_URL }}
+
+    - name: Deploy Database to Cloud Run
+      run: |
+        gcloud run deploy to-do-app-database-service \
+          --image ${{ env.DOCKER_IMAGE_DB_URL }} \
+          --platform managed \
+          --region us-east1 \
+          --allow-unauthenticated
+
+    - name: Deploy App to Cloud Run
+      run: |
+        gcloud run deploy to-do-app-service \
+          --image ${{ env.DOCKER_IMAGE_APP_URL }} \
+          --platform managed \
+          --region us-east1 \
+          --allow-unauthenticated
