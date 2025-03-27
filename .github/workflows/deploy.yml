@@ -61,10 +61,14 @@ jobs:
           --region ${{ secrets.GCP_LOCATION }} \
           --allow-unauthenticated
 
-    - name: Deploy App to Cloud Run
+    - name: Deploy Database to Cloud Run
       run: |
-        gcloud run deploy to-do-app-service \
-          --image ${{ env.DOCKER_IMAGE_APP_URL }} \
+        gcloud run deploy to-do-app-database-service \
+          --image ${{ env.DOCKER_IMAGE_DB_URL }} \
           --platform managed \
           --region ${{ secrets.GCP_LOCATION }} \
-          --allow-unauthenticated
+          --port 5432 \
+          --memory 512Mi \
+          --cpu 1 \
+          --max-instances 1 \
+          --project ${{ secrets.GCP_PROJECT_ID  }}
