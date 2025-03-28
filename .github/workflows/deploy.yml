@@ -50,16 +50,17 @@ jobs:
     - name: Deploy Application to Cloud Run
       run: |
         gcloud run deploy to-do-app-service \
-          --image ${{ env.DOCKER_IMAGE_APP_URL }} \  
-          --platform managed    \
-          --region ${{ secrets.GCP_LOCATION }}   \ 
-          --port 8080    \
-          --memory 512Mi   \ 
-          --cpu 1    \
-          --max-instances 1    \
-          --add-cloudsql-instances to-do-app-455020:europe-west3:to-do-app-db    \
-          --set-env-vars DB_HOST="/cloudsql/to-do-app-455020:europe-west3:to-do-app-db"    \
-          --set-env-vars INSTANCE_CONNECTION_NAME="to-do-app-455020:europe-west3:to-do-app-db"    \
-          --set-env-vars DB_NAME="to-do-app-database"   \
-          --set-env-vars DB_USER="my_user"    \
-          --set-env-vars DB_PASSWORD="my_password"
+            --image ${{ env.DOCKER_IMAGE_APP_URL }} \
+            --platform managed \
+            --region ${{ secrets.GCP_LOCATION }} \
+            --port 8080 \
+            --memory 512Mi \
+            --cpu 1 \
+            --max-instances 1 \
+            --add-cloudsql-instances ${{ secrets.DB_INSTANCE_CONNECTION_NAME }} \
+            --set-env-vars INSTANCE_UNIX_SOCKET="/cloudsql/${{ secrets.DB_INSTANCE_CONNECTION_NAME }}" \
+            --set-env-vars INSTANCE_CONNECTION_NAME="${{ secrets.DB_INSTANCE_CONNECTION_NAME }}" \
+            --set-env-vars DB_NAME="${{ secrets.DB_NAME }}" \
+            --set-env-vars DB_USER="${{ secrets.DB_USER }}" \
+            --set-env-vars DB_PASS="${{ secrets.DB_PASSWORD }}" \
+            --allow-unauthenticated
