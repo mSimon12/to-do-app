@@ -39,35 +39,22 @@ jobs:
       run: |
         gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev
 
-    - name: Build Docker images
+    - name: Build Docker image
       run: |
         echo "${{ secrets.ENV_FILE }}" >> api/deploy/.env
-        docker compose -f api/deploy/docker-compose.yml up -d --build
-        docker tag postgres ${{ env.DOCKER_IMAGE_DB_URL }}
-        docker tag to_do_app_image ${{ env.DOCKER_IMAGE_APP_URL }}
+        docker build -f api/deploy/Dockerfile.multistage -t ${{ env.DOCKER_IMAGE_APP_URL }} api/
         docker image list
-
-    - name: Push Database Docker image
-      run: docker push ${{ env.DOCKER_IMAGE_DB_URL }}
 
     - name: Push App Docker image
       run: docker push ${{ env.DOCKER_IMAGE_APP_URL }}
 
-    - name: Deploy Database to Cloud Run
+    - name: Deploy Application to Cloud Run
       run: |
-        gcloud run deploy to-do-app-database-service \
-          --image ${{ env.DOCKER_IMAGE_DB_URL }} \
+        gcloud run deploy to-do-app \
+          --image ${{ env.DOCKER_IMAGE_APP_URL }} \
           --platform managed \
           --region ${{ secrets.GCP_LOCATION }} \
-          --allow-unauthenticated
-
-    - name: Deploy Database to Cloud Run
-      run: |
-        gcloud run deploy to-do-app-database-service \
-          --image ${{ env.DOCKER_IMAGE_DB_URL }} \
-          --platform managed \
-          --region ${{ secrets.GCP_LOCATION }} \
-          --port 5432 \
+          --port 8080 \
           --memory 512Mi \
           --cpu 1 \
           --max-instances 1
