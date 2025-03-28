@@ -78,7 +78,11 @@ func getDatabaseUrl() string {
 		log.Fatalf("Missing POSTGRES_DB env variable")
 	}
 
-	urlDatabase := fmt.Sprintf("postgres://%v:%v@%v:5432/%v", dbUser, dbPwd, dbHost, database)
+	// urlDatabase := fmt.Sprintf("postgres://%v:%v@%v:5432/%v", dbUser, dbPwd, dbHost, database)
+	urlDatabase := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		dbHost, dbUser, dbPwd, database,
+	)
 
 	return urlDatabase
 }

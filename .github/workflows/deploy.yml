@@ -1,7 +1,6 @@
 name: Build and Deploy to Cloud Run
 
 env:
-  DOCKER_IMAGE_DB_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/deploy-images/to-do-app-db:latest"
   DOCKER_IMAGE_APP_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/deploy-images/to-do-app:latest"
 
 on: [push]
@@ -50,11 +49,17 @@ jobs:
 
     - name: Deploy Application to Cloud Run
       run: |
-        gcloud run deploy to-do-app \
-          --image ${{ env.DOCKER_IMAGE_APP_URL }} \
-          --platform managed \
-          --region ${{ secrets.GCP_LOCATION }} \
-          --port 8080 \
-          --memory 512Mi \
-          --cpu 1 \
-          --max-instances 1
+        gcloud run deploy to-do-app-service   
+          --image ${{ env.DOCKER_IMAGE_APP_URL }} \  
+          --platform managed    \
+          --region ${{ secrets.GCP_LOCATION }}   \ 
+          --port 8080    \
+          --memory 512Mi   \ 
+          --cpu 1    \
+          --max-instances 1    \
+          --add-cloudsql-instances to-do-app-455020:europe-west3:to-do-app-db    \
+          --set-env-vars DB_HOST="/cloudsql/to-do-app-455020:europe-west3:to-do-app-db"    \
+          --set-env-vars INSTANCE_CONNECTION_NAME="to-do-app-455020:europe-west3:to-do-app-db"    \
+          --set-env-vars DB_NAME="to-do-app-database"   \
+          --set-env-vars DB_USER="my_user"    \
+          --set-env-vars DB_PASSWORD="my_password"
