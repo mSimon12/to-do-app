@@ -3,14 +3,11 @@ name: Build and Deploy to Cloud Run
 env:
   DOCKER_IMAGE_APP_URL: "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/deploy-images/to-do-app:latest"
 
-on: [push]
-# on:
-#   push:
-#     branches:
-#       - main
-#       - stg
-
-
+on:
+  pull_request:
+    branches: 
+      - master
+    types: [closed]
 
 jobs:
   deploy:
