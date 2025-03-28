@@ -49,7 +49,7 @@ jobs:
 
     - name: Deploy Application to Cloud Run
       run: |
-        gcloud run deploy to-do-app-service   
+        gcloud run deploy to-do-app-service \
           --image ${{ env.DOCKER_IMAGE_APP_URL }} \  
           --platform managed    \
           --region ${{ secrets.GCP_LOCATION }}   \ 
