@@ -1,6 +1,5 @@
-DROP TABLE IF EXISTS tasks;
 
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,

@@ -10,7 +10,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 )
 
 // Database interface for mocking
@@ -56,19 +55,34 @@ func getDatabaseConnection() Database {
 }
 
 func getDatabaseUrl() string {
-	err := godotenv.Load("./models/database/.env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+	var env_exist bool
+	var dbUser string
+	var dbPwd string
+	var dbHost string
+	var database string
 
 	// urlExample := "postgres://username:password@localhost:5432/database_name"
-	dbUser := os.Getenv("POSTGRES_USER")
-	dbPwd := os.Getenv("POSTGRES_PASSWORD")
-	dbHost := os.Getenv("POSTGRES_HOST")
-	database := os.Getenv("POSTGRES_DB")
+	if dbUser, env_exist = os.LookupEnv("POSTGRES_USER"); !env_exist {
+		log.Fatalf("Missing POSTGRES_USER env variable")
+	}
 
-	urlDatabase := fmt.Sprintf("%v://%v:%v@localhost:5432/%v", dbHost, dbUser, dbPwd, database)
+	if dbPwd, env_exist = os.LookupEnv("POSTGRES_PASSWORD"); !env_exist {
+		log.Fatalf("Missing POSTGRES_PASSWORD env variable")
+	}
+
+	if dbHost, env_exist = os.LookupEnv("POSTGRES_HOST"); !env_exist {
+		log.Fatalf("Missing POSTGRES_HOST env variable")
+	}
+
+	if database, env_exist = os.LookupEnv("POSTGRES_DB"); !env_exist {
+		log.Fatalf("Missing POSTGRES_DB env variable")
+	}
+
+	// urlDatabase := fmt.Sprintf("postgres://%v:%v@%v:5432/%v", dbUser, dbPwd, dbHost, database)
+	urlDatabase := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		dbHost, dbUser, dbPwd, database,
+	)
 
 	return urlDatabase
 }
