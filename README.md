@@ -12,7 +12,7 @@ To be able to run this application, all you will need is to have docker installe
 ## Running
 
 ### Configure database container
-To configure the database container, create a file **.env** at [database](api/deploy) folder following the *example.env* and update the configuration for your PostgreSQL database. 
+To configure the database container, create a file **.env** at [deploy](api/deploy) folder following the *example.env* and update the configuration for your PostgreSQL database. 
 
 ### Create and Run containers
 
