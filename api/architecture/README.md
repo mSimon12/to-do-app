@@ -4,7 +4,7 @@
 The Rest API implemented for this To-Do application follows the Controller-Service-Model pattern, where the process is modularized in 3 main layers.
 
 ## Controller
-Provides the entrypoints for the RestAPI, and is responsible in forwarding the requests for the right services and to ensure the input and output patterns are in the right format.
+Provides the entrypoints for the RestAPI, and is responsible in forwarding the requests for the right services and in ensuring the input and output patterns are in the right format.
 
 The API provides endpoints for creating new tasks, consulting ordered list by desired criteria and filter items by match. Also, other 3 task endpoints allow consulting, updating and deleting specific tasks. 
 
@@ -53,15 +53,14 @@ The steps done to get to the current status of this project and the planned sequ
 	- [x] List ordered tasks by desired criteria.
 - [x] Implement pagination to list tasks request.
 - [x] Provide match filter functionality.
-- [ ] Implement tests.
-- [ ] Add simple CI/CD.
-- [ ] Deploy application on GCP.
+- [x] Implement tests.
+- [x] Add simple CI/CD.
+- [x] Deploy application on GCP.
 
 
 ### Extra
-- [ ] Add dependencies model.
-- [ ] Get order execution for ensuring dependencies.
-
-
-
-
+- [ ] Add dependencies model (table correlating tasks).
+- [ ] Get order execution for ensuring tasks dependencies.
+- [ ] Add user authentication.
+- [ ] Add user authentication.
+- [ ] Add simple Frontend.
