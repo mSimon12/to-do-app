@@ -19,8 +19,9 @@ To configure the database container, create a file **.env** at [deploy](api/depl
 This application was developed to be run as easy as possible, and this can be accomplished by simply using the docker compose to build the required containers.
 
 ```bash
-sudo docker compose -f docker-compose.yml up -d --build
+sudo docker compose -f api/deploy/docker-compose.yml up -d --build
 ```
+*It might need some minutes to create the Postgres database for the first time.
 
 The command above should be enough to run the system. At this point you should have 2 containers running in the background. One container responsible for the PostgreSQL database and another running the application and providing the API endpoints.
 To be sure that both are running, you can check if the containers were correctly created by calling  ``sudo docker ps`` and it should show something like this:
