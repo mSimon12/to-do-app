@@ -46,7 +46,7 @@ func TestGetTask(t *testing.T) {
 
 	// Construct expected JSON response
 	expectedResponseMap := map[string]interface{}{
-		"message": "Task queried successfully",
+		"message": "Task retrieved successfully",
 		"task": map[string]interface{}{
 			"Id":          expectedTask.Id,
 			"Title":       expectedTask.Title,

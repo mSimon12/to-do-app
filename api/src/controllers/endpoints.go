@@ -8,6 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateTask Creates a new task
+//
+//	@Summary		Create a new task
+//	@Description	Adds a new task to the To-Do List
+//	@Tags			Tasks
+//	@Accept			json
+//	@Produce		json
+//	@Param			task	body		service.TaskRequestBody	true	"Task data"
+//	@Success		201		{object}	map[string]interface{}	"Task created successfully"
+//	@Failure		400		{object}	map[string]interface{}	"Bad request"
+//	@Failure		500		{object}	map[string]interface{}	"Internal server error"
+//	@Router			/api/tasks [post]
 func createTask(c *gin.Context) {
 	var requestBody service.TaskRequestBody
 	var err error
@@ -30,6 +42,19 @@ func createTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "taskId": taskId})
 }
 
+// GetTask Retrieves a single task by ID
+//
+//	@Summary		Get a task by ID
+//	@Description	Fetch a specific task from the To-Do List
+//	@Tags			Tasks
+//	@Accept			json
+//	@Produce		json
+//	@Param			taskId	path		int						true	"Task ID"
+//	@Success		200		{object}	map[string]interface{}	"Task retrieved successfully"
+//	@Failure		400		{object}	map[string]interface{}	"Bad request"
+//	@Failure		404		{object}	map[string]interface{}	"Task not found"
+//	@Failure		500		{object}	map[string]interface{}	"Internal server error"
+//	@Router			/api/tasks/{taskId} [get]
 func getTask(c *gin.Context) {
 	taskIdString := c.Param("taskId")
 	taskId, err := service.ValidateTaskIdInput(taskIdString)
@@ -49,9 +74,23 @@ func getTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task queried successfully", "task": task})
+	c.JSON(http.StatusOK, gin.H{"message": "Task retrieved successfully", "task": task})
 }
 
+// UpdateTask Updates an existing task
+//
+//	@Summary		Update a task
+//	@Description	Modifies an existing task in the To-Do List
+//	@Tags			Tasks
+//	@Accept			json
+//	@Produce		json
+//	@Param			taskId	path		int						true	"Task ID"
+//	@Param			task	body		service.TaskRequestBody	true	"Updated task data"
+//	@Success		200		{object}	map[string]interface{}	"Task updated successfully"
+//	@Failure		400		{object}	map[string]interface{}	"Bad request"
+//	@Failure		404		{object}	map[string]interface{}	"Task not found"
+//	@Failure		500		{object}	map[string]interface{}	"Internal server error"
+//	@Router			/api/tasks/{taskId} [put]
 func updateTask(c *gin.Context) {
 	var err error
 	taskIdString := c.Param("taskId")
@@ -84,6 +123,19 @@ func updateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
 }
 
+// DeleteTask Deletes a task by ID
+//
+//	@Summary		Delete a task
+//	@Description	Removes a task from the To-Do List
+//	@Tags			Tasks
+//	@Accept			json
+//	@Produce		json
+//	@Param			taskId	path		int						true	"Task ID"
+//	@Success		200		{object}	map[string]interface{}	"Task deleted successfully"
+//	@Failure		400		{object}	map[string]interface{}	"Bad request"
+//	@Failure		404		{object}	map[string]interface{}	"Task not found"
+//	@Failure		500		{object}	map[string]interface{}	"Internal server error"
+//	@Router			/api/tasks/{taskId} [delete]
 func deleteTask(c *gin.Context) {
 	taskIdString := c.Param("taskId")
 	taskId, err := service.ValidateTaskIdInput(taskIdString)
@@ -105,7 +157,26 @@ func deleteTask(c *gin.Context) {
 
 }
 
-// Endpoint for querying tasks list
+// ListTasks Getting tasks in the To-Do List
+//
+//	@Summary		Getting tasks in the To-Do List
+//	@Description	Get all tasks from To-Do List that match filter conditions
+//	@Tags			Tasks
+//	@Accept			json
+//	@Produce		json
+//	@Param			offset					query		int						false	"Pagination offset (default: 0)"
+//	@Param			limit					query		int						false	"Pagination limit (default: 10)"
+//	@Param			sort_by					query		string					false	"Sort by field (e.g., 'title', 'description')"
+//	@Param			sort_order				query		string					false	"Sort order (ASC or DESC)"
+//	@Param			title_contains			query		string					false	"Filter by title (substring match)"
+//	@Param			description_contains	query		string					false	"Filter by description (substring match)"
+//	@Param			status					query		string					false	"Filter by task status"
+//	@Param			priority				query		string					false	"Filter by task priority"
+//	@Success		200						{object}	map[string]interface{}	"Successful response"
+//	@Failure		400						{object}	map[string]interface{}	"Bad request"
+//	@Failure		404						{object}	map[string]interface{}	"Tasks not found"
+//	@Failure		500						{object}	map[string]interface{}	"Internal server error"
+//	@Router			/api/tasks [get]
 func getTasksList(c *gin.Context) {
 
 	// Filtering
