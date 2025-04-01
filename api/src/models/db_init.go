@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 // Database interface for mocking
@@ -55,6 +56,12 @@ func getDatabaseConnection() Database {
 }
 
 func getDatabaseUrl() string {
+	err := godotenv.Load("../deploy/.env")
+
+	if err != nil {
+		log.Println("No .env file found!")
+	}
+
 	var env_exist bool
 	var dbUser string
 	var dbPwd string
