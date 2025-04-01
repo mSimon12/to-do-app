@@ -4,7 +4,7 @@ name: Build and test
 on: [push]
 
 jobs:
-  build:
+  build-test:
 
     runs-on: ubuntu-latest
     strategy:
@@ -33,27 +33,7 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-  test:
-
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: [ '1.24.x' ]
-    defaults:
-      run:
-          working-directory: ./api/src
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go-version }}
-      - name: Display Go version
-        run: go version
-      - name: Install dependencies
-        run: go get .
-      - name: Test with Go
+      - name: Execute Tests
         run: |
           go test -coverprofile coverage.out ./...
           go tool cover -html=coverage.out -o coverage-${{ matrix.go-version }}.html
