@@ -27,9 +27,16 @@ func dateStrToTime(date string) (time.Time, error) {
 }
 
 func CreateNewTask(task TaskRequestBody) (uint, error) {
-	dueDate, err := dateStrToTime(*task.DueDate)
-	if err != nil {
-		return 0, errors.New("invalid due_date format, expects: 'yyyy-mm-dd'")
+	var dueDate time.Time
+	var err error
+	if task.DueDate == nil {
+		dueDate = time.Now().AddDate(0, 0, 7)
+	} else {
+		dueDate, err = dateStrToTime(*task.DueDate)
+
+		if err != nil {
+			return 0, errors.New("invalid due_date format, expects: 'yyyy-mm-dd'")
+		}
 	}
 
 	if task.DueDate == nil {
