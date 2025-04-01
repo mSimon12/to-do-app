@@ -10,6 +10,10 @@ RUN go mod download
 
 COPY ./src .
 
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN export PATH=$(go env GOPATH)/bin:$PATH
+RUN swag init -generalInfo to-do-api.go
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-to-do-api .
 
 # Run the tests in the container

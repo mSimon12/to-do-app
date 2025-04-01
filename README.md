@@ -31,3 +31,5 @@ CONTAINER ID   IMAGE             COMMAND                  CREATED         STATUS
 22260beeadc6   to_do_app_image   "/docker-to-do-api"      3 minutes ago   Up 3 minutes   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp   to_do_app
 f9ebee888816   postgres:latest   "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp   to_do_app_db
 ```
+
+The available endpoints and the valid requests and parameters can be checked by accessing the documentation endpoint. With the system running, access documentation at ``http://localhost:8080/api/documentation/``.
