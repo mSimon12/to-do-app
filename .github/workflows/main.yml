@@ -24,6 +24,10 @@ jobs:
         run: go version
       - name: Install dependencies
         run: go get .
+      - name: Install Swaggo
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+      - name: Create API documentation
+        run: swag init -generalInfo to-do-api.go
       - name: Build
         run: go build -v ./...
 
