@@ -15,6 +15,11 @@ RUN go mod download
 # Copy the rest of the application code
 COPY ../src .
 
+# Create API documentation
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN export PATH=$(go env GOPATH)/bin:$PATH
+RUN swag init -generalInfo to-do-api.go
+
 # Build the Go application
 RUN go build -o to-do-api .
 
