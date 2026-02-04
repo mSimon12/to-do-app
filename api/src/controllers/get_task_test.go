@@ -21,7 +21,7 @@ func TestGetTask(t *testing.T) {
 	context.Params = []gin.Param{{Key: "taskId", Value: "1"}} // Proper parameter setup
 
 	// Mocking the GetTaskById function
-	createdAt := time.Now()
+	createdAt := time.Now().UTC()
 	dueDate := createdAt.AddDate(0, 0, 7)
 	expectedTask := models.Task{
 		Id:          1,

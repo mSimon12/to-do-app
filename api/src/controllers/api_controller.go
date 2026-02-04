@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	_ "to-do-api/docs"
-
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
