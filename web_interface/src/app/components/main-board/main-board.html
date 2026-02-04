@@ -1,0 +1,33 @@
+<div class="kanban-container">
+    <header class="board-header">
+    <h1>To-Do Kanban Board</h1>
+    <button class="add-btn" (click)="openCreateModal()">
+        <lucide-icon [img]="PlusIcon"></lucide-icon> New Task
+    </button>
+    </header>
+
+    <div class="board-columns" cdkDropListGroup>
+    <div class="column" *ngFor="let column of columns">
+        <div class="column-header">
+        <h2>{{ column.name }}</h2>
+        <span class="count">{{ column.tasks.length }}</span>
+        </div>
+
+        <div
+        cdkDropList
+        [cdkDropListData]="column.tasks"
+        class="task-list"
+        (cdkDropListDropped)="drop($event, column.status)"
+        >
+        <app-task-card
+            *ngFor="let task of column.tasks"
+            [task]="task"
+            cdkDrag
+            (click)="selectTask(task)"
+        ></app-task-card>
+        </div>
+    </div>
+    </div>
+
+    <app-task-details *ngIf="selectedTask" [task]="selectedTask" (close)="selectedTask = null" (saved)="onTaskSaved()"></app-task-details>
+</div>
