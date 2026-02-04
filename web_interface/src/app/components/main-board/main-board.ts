@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { TasksApi } from '../../services/tasks-api';
@@ -23,16 +23,19 @@ interface Column {
 })
 
 export class MainBoard implements OnInit {
+  public board_name: string = 'TaskFlow';
+  selectedTask: Task | null = null;
+
    columns: Column[] = [
     { name: 'To Do', status: 'To Do', tasks: [] },
     { name: 'In Progress', status: 'In Progress', tasks: [] },
-    { name: 'Done', status: 'done', tasks: [] }
+    { name: 'Done', status: 'Done', tasks: [] }
   ];
-  selectedTask: Task | null = null;
 
   constructor(
     private taskService: TasksApi,
-    public themeService: Theme
+    public themeService: Theme,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -43,8 +46,9 @@ export class MainBoard implements OnInit {
     this.taskService.getTasks().subscribe({
       next: (tasks) => {
         this.columns.forEach(col => {
-          col.tasks = tasks.filter(t => t.status === col.status);
+          col.tasks = tasks.filter(t => (t.status || '').toLowerCase() === col.status.toLowerCase());
         });
+        try { this.cd.detectChanges(); } catch (e) { }
       },
       error: (err) => {
         console.error('Error loading tasks:', err);
@@ -54,7 +58,7 @@ export class MainBoard implements OnInit {
           { id: 3, title: 'Fix Header Bug', description: 'The mobile menu is not closing correctly on navigation.', status: 'Done', priority: 1 }
         ];
         this.columns.forEach(col => {
-          col.tasks = mockTasks.filter(t => t.status === col.status);
+          col.tasks = mockTasks.filter(t => (t.status || '').toLowerCase() === col.status.toLowerCase());
         });
       }
     });

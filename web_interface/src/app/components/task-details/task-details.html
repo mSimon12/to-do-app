@@ -12,13 +12,13 @@
 
     <div class="modal-body">
         <div class="form-section">
-        <label>Task Title</label>
-        <input [(ngModel)]="task.title" placeholder="What needs to be done?" class="form-control title-input">
+            <label>Task Title</label>
+            <input [(ngModel)]="task.title" placeholder="What needs to be done?" class="form-control title-input">
         </div>
 
         <div class="form-section">
-        <label>Description</label>
-        <textarea [(ngModel)]="task.description" rows="5" placeholder="Add more details about this task..." class="form-control"></textarea>
+            <label>Description</label>
+            <textarea [(ngModel)]="task.description" rows="5" placeholder="Add more details about this task..." class="form-control"></textarea>
         </div>
 
         <div class="form-grid">
@@ -55,14 +55,16 @@
     </div>
 
     <div class="modal-footer">
-        <button *ngIf="task.id" class="btn btn-danger" (click)="deleteTask()">
-        <lucide-icon name="circle-alert" [size]="16"></lucide-icon>
-        <span>Delete Task</span>
-        </button>
+        @if (task.id) {
+            <button class="btn btn-danger" (click)="deleteTask()">
+            <lucide-icon name="circle-alert" [size]="16"></lucide-icon>
+            <span>Delete Task</span>
+            </button>
+        }
         <div class="spacer"></div>
         <button class="btn btn-secondary" (click)="close.emit()">Cancel</button>
         <button class="btn btn-primary" (click)="saveTask()">
-        <span>{{ task.id ? 'Update Task' : 'Create Task' }}</span>
+            <span>{{ task.id ? 'Update Task' : 'Create Task' }}</span>
         </button>
     </div>
     </div>
