@@ -2,7 +2,6 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task';
 import { LucideAngularModule } from 'lucide-angular';
-import { isNull } from 'util';
 
 @Component({
   selector: 'app-task-card',
@@ -19,6 +18,13 @@ export class TaskCard {
     if (this.task.priority <= 1) return 'p-low';
     if (this.task.priority === 2) return 'p-med';
     return 'p-high';
+  }
+
+  getPriorityLabel() {
+    if (this.task.priority == null) return 'Undefined';
+    if (this.task.priority <= 1) return 'Low';
+    if (this.task.priority === 2) return 'Medium';
+    return 'High';
   }
 
   getStatusIcon() {

@@ -1,53 +1,69 @@
 <div class="modal-backdrop" (click)="close.emit()">
     <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-        <h2>{{ task.id ? 'Edit Task' : 'Create Task' }}</h2>
+        <div class="title-area">
+        <span class="badge">{{ task.id ? 'Task ID: #' + task.id : 'New Task' }}</span>
+        <h2>{{ task.id ? 'Edit Task Details' : 'Create New Task' }}</h2>
+        </div>
         <button class="close-btn" (click)="close.emit()">
-        <lucide-icon name="x"></lucide-icon>
+        <lucide-icon name="x" [size]="20"></lucide-icon>
         </button>
     </div>
 
     <div class="modal-body">
-        <div class="form-group">
-        <label>Title</label>
-        <input [(ngModel)]="task.title" placeholder="Enter task title" class="form-control">
+        <div class="form-section">
+        <label>Task Title</label>
+        <input [(ngModel)]="task.title" placeholder="What needs to be done?" class="form-control title-input">
         </div>
 
-        <div class="form-group">
+        <div class="form-section">
         <label>Description</label>
-        <textarea [(ngModel)]="task.description" rows="4" placeholder="Enter details..." class="form-control"></textarea>
+        <textarea [(ngModel)]="task.description" rows="5" placeholder="Add more details about this task..." class="form-control"></textarea>
         </div>
 
-        <div class="form-row">
-        <div class="form-group col">
-            <label>Status</label>
+        <div class="form-grid">
+        <div class="form-section">
+            <label>Current Status</label>
+            <div class="select-wrapper">
             <select [(ngModel)]="task.status" class="form-control">
-            <option value="To Do">To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done">Done</option>
             </select>
+            </div>
         </div>
-        <div class="form-group col">
-            <label>Priority</label>
+        
+        <div class="form-section">
+            <label>Priority Level</label>
+            <div class="select-wrapper">
             <select [(ngModel)]="task.priority" class="form-control">
-            <option [ngValue]="1">Low</option>
-            <option [ngValue]="2">Medium</option>
-            <option [ngValue]="3">High</option>
+                <option [ngValue]="1">Low Priority</option>
+                <option [ngValue]="2">Medium Priority</option>
+                <option [ngValue]="3">High Priority</option>
             </select>
+            </div>
         </div>
         </div>
         
-        <div class="form-group">
-        <label>Due Date</label>
-        <input type="date" [(ngModel)]="task.due_date" class="form-control">
+        <div class="form-section">
+        <label>Target Due Date</label>
+        <div class="input-with-icon">
+            <lucide-icon name="calendar" [size]="16"></lucide-icon>
+            <input type="date" [(ngModel)]="task.due_date" class="form-control">
+        </div>
         </div>
     </div>
 
     <div class="modal-footer">
-        <button *ngIf="task.id" class="delete-btn" (click)="deleteTask()">Delete</button>
+        <button *ngIf="task.id" class="btn btn-danger" (click)="deleteTask()">
+        <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+        <span>Delete Task</span>
+        </button>
         <div class="spacer"></div>
-        <button class="cancel-btn" (click)="close.emit()">Cancel</button>
-        <button class="save-btn" (click)="saveTask()">Save Changes</button>
+        <button class="btn btn-secondary" (click)="close.emit()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveTask()">
+        <span>{{ task.id ? 'Update Task' : 'Create Task' }}</span>
+        </button>
     </div>
     </div>
 </div>

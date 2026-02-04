@@ -20,6 +20,7 @@ export class TaskDetails {
   constructor(private taskService: TasksApi) {}
 
   saveTask() {
+    if (!this.task.title) return;
     if (this.task.id) {
       this.taskService.updateTask(this.task.id, this.task).subscribe(() => this.saved.emit());
     } else {

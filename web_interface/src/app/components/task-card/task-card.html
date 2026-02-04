@@ -1,20 +1,27 @@
 <div class="task-card">
     <div class="card-header">
-    <span class="priority-badge" [ngClass]="getPriorityClass()">
-        Priority {{ task.priority }}
-    </span>
-    <button class="more-btn"><lucide-icon name="more-vertical" [size]="16"></lucide-icon></button>
+    <span class="priority-indicator" [ngClass]="getPriorityClass()"></span>
+    <span class="priority-label">{{ getPriorityLabel() }}</span>
+    <div class="spacer"></div>
+    <button class="more-btn"><lucide-icon name="more-vertical" [size]="14"></lucide-icon></button>
     </div>
+    
     <h3 class="task-title">{{ task.title }}</h3>
-    <p class="task-desc" *ngIf="task.description">{{ task.description | slice:0:60 }}{{ task.description.length > 60 ? '...' : '' }}</p>
+    <p class="task-desc" *ngIf="task.description">
+    {{ task.description | slice:0:80 }}{{ task.description.length > 80 ? '...' : '' }}
+    </p>
     
     <div class="card-footer">
-    <div class="date-info" *ngIf="task.created_at">
-        <lucide-icon name="calendar" [size]="14"></lucide-icon>
+    <div class="meta-item" *ngIf="task.created_at">
+        <lucide-icon name="calendar" [size]="12"></lucide-icon>
         <span>{{ task.created_at | date:'MMM d' }}</span>
     </div>
-    <div class="status-icon">
-        <lucide-icon [name]="getStatusIcon()" [size]="16"></lucide-icon>
-    </div>
+    <div class="spacer"></div>
+    
+    @if (task.status != null) {
+        <div class="status-badge" [ngClass]="task.status.toLowerCase().replace(' ', '-')">
+            <lucide-icon [name]="getStatusIcon()" [size]="12"></lucide-icon>
+        </div>
+    }
     </div>
 </div>
