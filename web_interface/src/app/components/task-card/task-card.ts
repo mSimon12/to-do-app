@@ -29,8 +29,8 @@ export class TaskCard {
 
   getStatusIcon() {
     switch (this.task.status) {
-      case 'Done': return 'check-circle';
-      case 'In Progress': return 'play-circle';
+      case 'done': return 'circle-check';
+      case 'in-progress': return 'circle-play';
       default: return 'list-todo';
     }
   }
