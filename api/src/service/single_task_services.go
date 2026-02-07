@@ -8,40 +8,30 @@ import (
 	"to-do-api/models"
 )
 
+var ErrDatabaseGeneral = errors.New("fail processing request on database")
+var ErrRowNotFound = errors.New("requested resource not found on database")
+var ErrInvalidInput = errors.New("invalid input")
+
 type TaskRequestBody struct {
 	Title       *string `json:"title"`
 	Priority    *uint   `json:"priority"`
 	Description *string `json:"description"`
 	Status      *string `json:"status"`
-	DueDate     *string `json:"due_date"`
+	DueDate     *int64  `json:"due_date"`
 }
 
-var ErrDatabaseGeneral = errors.New("fail processing request on database")
-var ErrRowNotFound = errors.New("requested resource not found on database")
-
-func dateStrToTime(date string) (time.Time, error) {
-	layout := "2006-01-02"
-	convertedDate, err := time.Parse(layout, date)
-
-	return convertedDate, err
+type TaskResponseBody struct {
+	Id          uint
+	Title       string
+	Description string
+	Status      string
+	Priority    uint16
+	CreatedAt   int64
+	DueDate     int64
 }
 
 func CreateNewTask(task TaskRequestBody) (uint, error) {
-	var dueDate time.Time
-	var err error
-	if task.DueDate == nil {
-		dueDate = time.Now().AddDate(0, 0, 7)
-	} else {
-		dueDate, err = dateStrToTime(*task.DueDate)
-
-		if err != nil {
-			return 0, errors.New("invalid due_date format, expects: 'yyyy-mm-dd'")
-		}
-	}
-
-	if task.DueDate == nil {
-		dueDate = time.Now().AddDate(0, 0, 7)
-	}
+	dueDate := time.Unix(*task.DueDate, 0)
 
 	newTask := models.Task{
 		Title:       *task.Title,
@@ -62,28 +52,36 @@ func CreateNewTask(task TaskRequestBody) (uint, error) {
 	return newTaskId, nil
 }
 
-func GetTaskById(taskId uint) (models.Task, error) {
-	var task models.Task
+func GetTaskById(taskId uint) (TaskResponseBody, error) {
 
 	idExist, err := checkIdExist(taskId)
 	if !idExist {
-		return task, ErrRowNotFound
+		return TaskResponseBody{}, ErrRowNotFound
 	} else if err != nil {
-		return task, ErrDatabaseGeneral
+		return TaskResponseBody{}, ErrDatabaseGeneral
 	}
 
-	task, err = models.QueryTask(taskId)
+	task, err := models.QueryTask(taskId)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return task, ErrRowNotFound
+			return TaskResponseBody{}, ErrRowNotFound
 		} else {
 			fmt.Printf("Query Task failed: %v\n", err)
-			return task, ErrDatabaseGeneral
+			return TaskResponseBody{}, ErrDatabaseGeneral
 		}
 	}
 
-	return task, nil
+	return TaskResponseBody{
+		Id:          task.Id,
+		Title:       task.Title,
+		Description: task.Description,
+		Status:      task.Status,
+		Priority:    task.Priority,
+		CreatedAt:   task.CreatedAt.Unix(),
+		DueDate:     task.DueDate.Unix(),
+	}, nil
+
 }
 
 func UpdateTask(taskId uint, task TaskRequestBody) error {
@@ -111,11 +109,8 @@ func UpdateTask(taskId uint, task TaskRequestBody) error {
 		currentTask.Status = *task.Status
 	}
 	if task.DueDate != nil {
-		dueDate, err := dateStrToTime(*task.DueDate)
-		if err != nil {
-			return errors.New("invalid due_date format, expects: 'yyyy-mm-dd'")
-		}
-		currentTask.DueDate = dueDate
+		// Convert Unix timestamp (seconds) to time.Time
+		currentTask.DueDate = time.Unix(*task.DueDate, 0)
 	}
 
 	err = models.UpdateTask(currentTask)
