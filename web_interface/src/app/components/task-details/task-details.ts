@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../../models/task';
 import { TasksApi } from '../../services/tasks-api';
+import { STATUS, STATUS_LABELS, PRIORITY, PRIORITY_LABELS } from '../../models/constants';
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
@@ -17,6 +18,16 @@ export class TaskDetails {
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
+  readonly statusOptions = Object.values(STATUS).map(statusValue => ({
+    name: STATUS_LABELS[statusValue],
+    status: statusValue
+  }));
+
+  readonly priorityLevels = Object.values(PRIORITY).map(priority => ({
+    value: priority,
+    label: PRIORITY_LABELS[priority]
+  }));
+  
   constructor(private taskService: TasksApi) {}
 
   saveTask() {

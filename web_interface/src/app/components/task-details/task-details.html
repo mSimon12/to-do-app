@@ -26,9 +26,9 @@
             <label>Current Status</label>
             <div class="select-wrapper">
             <select [(ngModel)]="task.status" class="form-control">
-                <option value="To Do">To Do</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Done">Done</option>
+                @for (status of statusOptions; track status.status) {
+                  <option [value]="status.status">{{ status.name }}</option>
+                }
             </select>
             </div>
         </div>
@@ -37,9 +37,9 @@
             <label>Priority Level</label>
             <div class="select-wrapper">
             <select [(ngModel)]="task.priority" class="form-control">
-                <option [ngValue]="1">Low Priority</option>
-                <option [ngValue]="2">Medium Priority</option>
-                <option [ngValue]="3">High Priority</option>
+                @for (priority of priorityLevels; track priority.value) {
+                  <option [ngValue]="priority.value">{{ priority.label }}</option>
+                }
             </select>
             </div>
         </div>

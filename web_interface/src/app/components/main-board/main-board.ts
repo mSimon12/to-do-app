@@ -4,6 +4,7 @@ import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from 
 import { TasksApi } from '../../services/tasks-api';
 import { Theme } from '../../services/theme';
 import { Task } from '../../models/task';
+import { STATUS, STATUS_LABELS } from '../../models/constants';
 import { TaskCard } from '../task-card/task-card';
 import { TaskDetails } from '../task-details/task-details';
 import { LucideAngularModule, Plus } from 'lucide-angular';
@@ -26,11 +27,11 @@ export class MainBoard implements OnInit {
   public board_name: string = 'TaskFlow';
   selectedTask: Task | null = null;
 
-   columns: Column[] = [
-    { name: 'To Do', status: 'To Do', tasks: [] },
-    { name: 'In Progress', status: 'In Progress', tasks: [] },
-    { name: 'Done', status: 'Done', tasks: [] }
-  ];
+   columns: Column[] = Object.values(STATUS).map(statusValue => ({
+    name: STATUS_LABELS[statusValue],
+    status: statusValue,
+    tasks: []
+  }));
 
   constructor(
     private taskService: TasksApi,
@@ -52,14 +53,6 @@ export class MainBoard implements OnInit {
       },
       error: (err) => {
         console.error('Error loading tasks:', err);
-        const mockTasks: Task[] = [
-          { id: 1, title: 'Refactor Auth Service', description: 'Clean up the login logic and implement better error handling.', status: 'To Do', priority: 3 },
-          { id: 2, title: 'Update Dashboard UI', description: 'Apply the new design system to the main dashboard views.', status: 'In Progress', priority: 2 },
-          { id: 3, title: 'Fix Header Bug', description: 'The mobile menu is not closing correctly on navigation.', status: 'Done', priority: 1 }
-        ];
-        this.columns.forEach(col => {
-          col.tasks = mockTasks.filter(t => (t.status || '').toLowerCase() === col.status.toLowerCase());
-        });
       }
     });
   }
@@ -94,7 +87,7 @@ export class MainBoard implements OnInit {
     this.selectedTask = {
       title: '',
       description: '',
-      status: 'To Do',
+      status: STATUS.BACKLOG,
       priority: 1
     };
   }

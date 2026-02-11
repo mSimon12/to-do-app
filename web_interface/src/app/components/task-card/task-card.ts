@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task';
+import { PRIORITY, PRIORITY_LABELS, STATUS_ICONS } from '../../models/constants';
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
@@ -15,23 +16,20 @@ export class TaskCard {
 
   getPriorityClass() {
     if (this.task.priority == null) return 'undefined';
-    if (this.task.priority <= 1) return 'p-low';
-    if (this.task.priority === 2) return 'p-med';
+    if (this.task.priority <= PRIORITY.LOW) return 'p-low';
+    if (this.task.priority === PRIORITY.MEDIUM) return 'p-med';
     return 'p-high';
   }
 
   getPriorityLabel() {
-    if (this.task.priority == null) return 'Undefined';
-    if (this.task.priority <= 1) return 'Low';
-    if (this.task.priority === 2) return 'Medium';
-    return 'High';
+    if (this.task.priority == null) return PRIORITY_LABELS['undefined'];
+    if (this.task.priority <= PRIORITY.LOW) return PRIORITY_LABELS[PRIORITY.LOW];
+    if (this.task.priority === PRIORITY.MEDIUM) return PRIORITY_LABELS[PRIORITY.MEDIUM];
+    return PRIORITY_LABELS[PRIORITY.HIGH];
   }
 
   getStatusIcon() {
-    switch (this.task.status) {
-      case 'done': return 'circle-check';
-      case 'in-progress': return 'circle-play';
-      default: return 'list-todo';
-    }
+    const status = this.task.status?.toLowerCase() || '';
+    return STATUS_ICONS[status as keyof typeof STATUS_ICONS] || 'list-todo';
   }
 }
