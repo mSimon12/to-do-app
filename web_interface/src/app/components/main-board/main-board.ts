@@ -77,7 +77,11 @@ export class MainBoard implements OnInit {
       );
       
       if (task.id) {
-        this.taskService.updateTask(task.id, { ...task, status: newStatus }).subscribe();
+        this.taskService.updateTask(task.id, { ...task, status: newStatus }).subscribe(
+          () => {
+            this.loadTasks();
+          }
+        );
       }
     }
   }
