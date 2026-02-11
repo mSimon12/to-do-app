@@ -27,6 +27,10 @@ export class TasksApi {
 
   constructor(private http: HttpClient) {}
 
+  private toIsoNoMs(timestamp: number): string {
+    return new Date(timestamp * 1000).toISOString().split('T')[0];
+  }
+
   getTasks(): Observable<Task[]> {
     return this.http.get<ApiResponse>(this.apiUrl).pipe(
       map(res => {
@@ -42,23 +46,49 @@ export class TasksApi {
           status: t.status,
           priority: t.priority,
           description: t.description,
-          created_at: t.created_at ? new Date(t.created_at * 1000).toISOString() : undefined,
-          due_date: t.due_date ? new Date(t.due_date * 1000).toISOString() : undefined,
+          created_at: t.created_at ? this.toIsoNoMs(t.created_at) : undefined,
+          due_date: t.due_date ? this.toIsoNoMs(t.due_date) : undefined,
         }));
       })
     );
   }
 
   getTask(id: number): Observable<Task> {
-    return this.http.get<Task>(`${this.apiUrl}/${id}`);
+    interface SingleResponse { task: ApiTask }
+    return this.http.get<SingleResponse>(`${this.apiUrl}/${id}`).pipe(
+      map(res => {
+        const t = res && res.task ? res.task : null;
+        if (!t) {
+          return {} as Task;
+        }
+
+        return {
+          id: t.id,
+          title: t.title,
+          status: t.status,
+          priority: t.priority,
+          description: t.description,
+          created_at: t.created_at ? this.toIsoNoMs(t.created_at) : undefined,
+          due_date: t.due_date ? this.toIsoNoMs(t.due_date) : undefined,
+        } as Task;
+      })
+    );
   }
 
   createTask(task: Task): Observable<Task> {
-    return this.http.post<Task>(this.apiUrl, task);
+    const payload = {
+      ...task,
+      due_date: task.due_date ? Math.floor(new Date(task.due_date).getTime() / 1000) : undefined,
+    };
+    return this.http.post<Task>(this.apiUrl, payload);
   }
 
   updateTask(id: number, task: Partial<Task>): Observable<Task> {
-    return this.http.put<Task>(`${this.apiUrl}/${id}`, task);
+    const payload = {
+      ...task,
+      due_date: task.due_date ? Math.floor(new Date(task.due_date).getTime() / 1000) : undefined,
+    };
+    return this.http.put<Task>(`${this.apiUrl}/${id}`, payload);
   }
 
   deleteTask(id: number): Observable<void> {
