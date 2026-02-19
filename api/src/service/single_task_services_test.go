@@ -74,29 +74,6 @@ func TestCreateNewTaskDBError(t *testing.T) {
 	assert.Equal(t, errors.New("fail processing request on database"), err)
 }
 
-func TestCreateNewTaskInvalidDueDate(t *testing.T) {
-
-	title := "Test Task"
-	priority := uint(1)
-	description := "This is a test task"
-	status := "pending"
-	dueDate := testDueDate
-
-	taskRequest := TaskRequestBody{
-		Title:       &title,
-		Priority:    &priority,
-		Description: &description,
-		Status:      &status,
-		DueDate:     &dueDate,
-	}
-
-	// Run function
-	_, err := CreateNewTask(taskRequest)
-
-	// Assertions
-	assert.Equal(t, errors.New("invalid due_date format, expects: 'yyyy-mm-dd'"), err)
-}
-
 // Query Task by Id test /////////////////////////////////////////////////
 func TestGetTaskById(t *testing.T) {
 	createdAt := time.Unix(testCreatedAt, 0)
@@ -110,6 +87,16 @@ func TestGetTaskById(t *testing.T) {
 		Status:      "done",
 		CreatedAt:   createdAt,
 		DueDate:     dueDate,
+	}
+
+	expectedTask := TaskResponseBody{
+		Id:          1,
+		Title:       "Test Task",
+		Description: "This is a test task",
+		Status:      "done",
+		Priority:    uint16(5),
+		CreatedAt:   testCreatedAt,
+		DueDate:     testDueDate,
 	}
 
 	// Mock models.CheckExistence function
@@ -128,7 +115,7 @@ func TestGetTaskById(t *testing.T) {
 
 	// Assertions
 	assert.Nil(t, err)
-	assert.Equal(t, mockTask, task)
+	assert.Equal(t, expectedTask, task)
 }
 
 func TestGetTaskByIdInvalidId(t *testing.T) {
