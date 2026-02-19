@@ -1,0 +1,36 @@
+
+services:
+  db:
+    image: postgres:latest
+    container_name: to_do_app_db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  api:
+    image: to_do_app_api:latest
+    container_name: to_do_app_api
+    restart: always
+    build:
+      context: ../api
+      dockerfile: ../api/Dockerfile.multistage
+    depends_on:
+      - db
+    env_file:
+      - .env  # Load env variables into the app
+    ports:
+      - "8080:8080"
+
+  webpage:
+    image: to_do_app_ui:latest
+    container_name: to_do_app_ui
+    restart: always
+    build:
+      context: ../web_interface
+      dockerfile: ../web_interface/Dockerfile.multistage
+    depends_on:
+      - api
+    ports:
+      - "3000:4000"
