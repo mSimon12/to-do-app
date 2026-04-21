@@ -65,10 +65,6 @@ cp deploy/example.env deploy/.env
 
 ## ▶️ Running the Application
 
-You can run the system either directly on your machine or using Docker.
-
-### 🐳 Option 1: Run with Docker (Recommended)
-
 Start all services (database, API, and web interface) using Docker Compose:
 
 ```bash
@@ -96,27 +92,6 @@ xxxxxxxxxxxx   to_do_app_ui:latest  "..."                 1 min ago      Up 1 mi
 xxxxxxxxxxxx   to_do_app_api:latest "/docker-to-do-api"  1 min ago      Up 1 min      0.0.0.0:8080->8080/tcp   to_do_app_api
 xxxxxxxxxxxx   postgres:latest      "docker-entrypoint…" 1 min ago      Up 1 min      0.0.0.0:5432->5432/tcp   to_do_app_db
 ```
-
-### 💻 Option 2: Run Without Containers
-
-Open two terminals.
-
-**Terminal 1 — Backend API**
-
-```bash
-cd api
-go run .
-```
-
-**Terminal 2 — Angular Frontend**
-
-```bash
-cd web_interface
-npm install
-npm start
-```
-
-The web interface will be available at `http://localhost:4200`.
 
 ---
 
