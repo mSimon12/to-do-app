@@ -6,8 +6,6 @@ import (
 	"io"
 	"net/http"
 	"testing"
-	"time"
-	"to-do-api/models"
 	"to-do-api/service"
 
 	"bou.ke/monkey"
@@ -15,25 +13,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const testCreatedAt = int64(1770843800)
+const testDueDate = int64(1770844785)
+
 func TestGetTask(t *testing.T) {
 	requestBody := TestTaskRequestBody{}
 	context, recorder := getTestGinContextAndRecorder(requestBody)
 	context.Params = []gin.Param{{Key: "taskId", Value: "1"}} // Proper parameter setup
 
 	// Mocking the GetTaskById function
-	createdAt := time.Now()
-	dueDate := createdAt.AddDate(0, 0, 7)
-	expectedTask := models.Task{
+	expectedTask := service.TaskResponseBody{
 		Id:          1,
 		Title:       "test",
 		Description: "nothing",
 		Status:      "done",
 		Priority:    5,
-		CreatedAt:   createdAt,
-		DueDate:     dueDate,
+		CreatedAt:   testCreatedAt,
+		DueDate:     testDueDate,
 	}
 
-	monkey.Patch(service.GetTaskById, func(taskId uint) (models.Task, error) {
+	monkey.Patch(service.GetTaskById, func(taskId uint) (service.TaskResponseBody, error) {
 		return expectedTask, nil
 	})
 	defer monkey.UnpatchAll()
@@ -53,8 +52,8 @@ func TestGetTask(t *testing.T) {
 			"Description": expectedTask.Description,
 			"Status":      expectedTask.Status,
 			"Priority":    expectedTask.Priority,
-			"CreatedAt":   expectedTask.CreatedAt.Format("2006-01-02T15:04:05.999999999Z"), // Ensure consistent format
-			"DueDate":     expectedTask.DueDate.Format("2006-01-02T15:04:05.999999999Z"),
+			"CreatedAt":   expectedTask.CreatedAt,
+			"DueDate":     expectedTask.DueDate,
 		},
 	}
 
@@ -91,8 +90,8 @@ func TestGetTaskInexistentId(t *testing.T) {
 	context.Params = []gin.Param{{Key: "taskId", Value: "10"}} // Proper parameter setup
 
 	// Mocking the GetTaskById function
-	monkey.Patch(service.GetTaskById, func(taskId uint) (models.Task, error) {
-		return models.Task{}, service.ErrRowNotFound
+	monkey.Patch(service.GetTaskById, func(taskId uint) (service.TaskResponseBody, error) {
+		return service.TaskResponseBody{}, service.ErrRowNotFound
 	})
 	defer monkey.UnpatchAll()
 
@@ -115,8 +114,8 @@ func TestGetTaskServerError(t *testing.T) {
 	context.Params = []gin.Param{{Key: "taskId", Value: "10"}} // Proper parameter setup
 
 	// Mocking the GetTaskById function
-	monkey.Patch(service.GetTaskById, func(taskId uint) (models.Task, error) {
-		return models.Task{}, service.ErrDatabaseGeneral
+	monkey.Patch(service.GetTaskById, func(taskId uint) (service.TaskResponseBody, error) {
+		return service.TaskResponseBody{}, service.ErrDatabaseGeneral
 	})
 	defer monkey.UnpatchAll()
 

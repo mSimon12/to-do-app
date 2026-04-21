@@ -37,8 +37,19 @@ jobs:
         run: |
           go test -coverprofile coverage.out ./...
           go tool cover -html=coverage.out -o coverage-${{ matrix.go-version }}.html
+
+      - name: Convert coverage to Cobertura XML
+        run: |
+          go install github.com/boumenot/gocover-cobertura@latest
+          gocover-cobertura < coverage.out > coverage.xml
+
       - name: Upload Go test results
         uses: actions/upload-artifact@v4
         with:
           name: Go-results-${{ matrix.go-version }}
           path: coverage-${{ matrix.go-version }}.html
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml

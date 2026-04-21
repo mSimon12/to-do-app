@@ -10,8 +10,13 @@ import (
 var defaultPageConfig models.TasksPaginationQuery = models.TasksPaginationQuery{Offset: 0, SortBy: "id", SortOrder: "ASC", Limit: 10}
 
 type taskInfo struct {
-	Id    uint
-	Title string
+	Id          uint   `json:"id"`
+	Title       string `json:"title"`
+	Status      string `json:"status"`
+	Priority    uint16 `json:"priority"`
+	Description string `json:"description"`
+	CreatedAt   int64  `json:"created_at"`
+	DueDate     int64  `json:"due_date"`
 }
 
 func CreatePageConfig(offset string, limit string, sortBy string, sortOrder string) (models.TasksPaginationQuery, error) {
@@ -112,13 +117,22 @@ func appendFilter(filterCriteria []models.TasksFilterQuery, filterType string, f
 	return filterCriteria
 }
 
-func GetTasksList(filterConfig []models.TasksFilterQuery, pageConfig models.TasksPaginationQuery) (map[int]taskInfo, error) {
-	orderedTasks := map[int]taskInfo{}
+func GetTasksList(filterConfig []models.TasksFilterQuery, pageConfig models.TasksPaginationQuery) ([]taskInfo, error) {
+	orderedTasks := []taskInfo{}
 
 	queriedTasks, err := models.QueryTasks(filterConfig, pageConfig)
 
 	for taskIdx, task := range queriedTasks {
-		newTask := taskInfo{Id: task.Id, Title: task.Title}
+		newTask := taskInfo{
+			Id:          task.Id,
+			Title:       task.Title,
+			Status:      task.Status,
+			Priority:    task.Priority,
+			Description: task.Description,
+			CreatedAt:   task.CreatedAt.Unix(),
+			DueDate:     task.DueDate.Unix(),
+		}
+		orderedTasks = append(orderedTasks, newTask)
 		orderedTasks[taskIdx] = newTask
 	}
 

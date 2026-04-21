@@ -1,0 +1,71 @@
+<div class="modal-backdrop" (click)="close.emit()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+        <div class="title-area">
+        <span class="badge">{{ task.id ? 'Task ID: #' + task.id : 'New Task' }}</span>
+        <h2>{{ task.id ? 'Edit Task Details' : 'Create New Task' }}</h2>
+        </div>
+        <button class="close-btn" (click)="close.emit()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-section">
+            <label>Task Title</label>
+            <input [(ngModel)]="task.title" placeholder="What needs to be done?" class="form-control title-input">
+        </div>
+
+        <div class="form-section">
+            <label>Description</label>
+            <textarea [(ngModel)]="task.description" rows="5" placeholder="Add more details about this task..." class="form-control"></textarea>
+        </div>
+
+        <div class="form-grid">
+        <div class="form-section">
+            <label>Current Status</label>
+            <div class="select-wrapper">
+            <select [(ngModel)]="task.status" class="form-control">
+                @for (status of statusOptions; track status.status) {
+                  <option [value]="status.status">{{ status.name }}</option>
+                }
+            </select>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <label>Priority Level</label>
+            <div class="select-wrapper">
+            <select [(ngModel)]="task.priority" class="form-control">
+                @for (priority of priorityLevels; track priority.value) {
+                  <option [ngValue]="priority.value">{{ priority.label }}</option>
+                }
+            </select>
+            </div>
+        </div>
+        </div>
+        
+        <div class="form-section">
+            <label>Target Due Date</label>
+            <div class="input-with-icon">
+                <lucide-icon name="calendar" [size]="16"></lucide-icon>
+                <input type="date" [(ngModel)]="task.due_date" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        @if (task.id) {
+            <button class="btn btn-danger" (click)="deleteTask()">
+            <lucide-icon name="circle-alert" [size]="16"></lucide-icon>
+            <span>Delete Task</span>
+            </button>
+        }
+        <div class="spacer"></div>
+        <button class="btn btn-secondary" (click)="close.emit()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveTask()">
+            <span>{{ task.id ? 'Update Task' : 'Create Task' }}</span>
+        </button>
+    </div>
+    </div>
+</div>

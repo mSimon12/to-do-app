@@ -18,7 +18,7 @@ func TestValidateNewTaskInput(t *testing.T) {
 	desc := "New description"
 	prio := uint(8)
 	status := "done"
-	dueDate := "2025-10-03"
+	dueDate := int64(1770843800)
 
 	err = ValidateNewTaskInput(TaskRequestBody{Title: &title, Description: &desc, Priority: &prio, Status: &status, DueDate: &dueDate})
 	assert.Nil(t, err, "Should return no error for input containing all info")
@@ -43,7 +43,7 @@ func TestValidateUpdateTaskInput(t *testing.T) {
 	desc := "New description"
 	prio := uint(8)
 	status := "done"
-	dueDate := "2025-10-03"
+	dueDate := int64(1770843800)
 
 	err = ValidateUpdateTaskInput(TaskRequestBody{Title: &title})
 	assert.Nil(t, err, "Should return no error for input containing Title")
