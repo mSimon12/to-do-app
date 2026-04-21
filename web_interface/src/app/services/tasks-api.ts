@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable} from 'rxjs';
+import { Observable, expand, reduce, EMPTY } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Task } from '../models/task';
 
@@ -16,6 +16,7 @@ interface ApiTask {
 
 interface ApiResponse {
   data: ApiTask[];
+  pagination: { offset: number; limit: number; total_tasks: number };
 }
 
 @Injectable({
@@ -31,25 +32,34 @@ export class TasksApi {
     return new Date(timestamp * 1000).toISOString().split('T')[0];
   }
 
-  getTasks(): Observable<Task[]> {
-    return this.http.get<ApiResponse>(this.apiUrl).pipe(
-      map(res => {
-        // Ensure we have a valid array before processing
-        const list = res && Array.isArray(res.data) ? res.data : [];
-        if (list.length === 0) {
-          return [];
-        }
+  private toTask(t: ApiTask): Task {
+    return {
+      id: t.id,
+      title: t.title,
+      status: t.status,
+      priority: t.priority,
+      description: t.description,
+      created_at: t.created_at ? this.toIsoNoMs(t.created_at) : undefined,
+      due_date: t.due_date ? this.toIsoNoMs(t.due_date) : undefined,
+    };
+  }
 
-        return list.map(t => ({
-          id: t.id,
-          title: t.title,
-          status: t.status,
-          priority: t.priority,
-          description: t.description,
-          created_at: t.created_at ? this.toIsoNoMs(t.created_at) : undefined,
-          due_date: t.due_date ? this.toIsoNoMs(t.due_date) : undefined,
-        }));
-      })
+  private fetchPage(offset: number): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(this.apiUrl, {
+      params: { limit: '100', offset: String(offset) }
+    });
+  }
+
+  getTasks(): Observable<Task[]> {
+    return this.fetchPage(0).pipe(
+      expand(res => {
+        const { offset, limit, total_tasks } = res.pagination;
+        return offset + limit < total_tasks ? this.fetchPage(offset + limit) : EMPTY;
+      }),
+      reduce((all: Task[], res) => {
+        const page = Array.isArray(res.data) ? res.data.map(t => this.toTask(t)) : [];
+        return all.concat(page);
+      }, [])
     );
   }
 
