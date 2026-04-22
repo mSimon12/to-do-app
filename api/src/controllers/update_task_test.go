@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"to-do-api/service"
 
@@ -104,4 +106,22 @@ func TestUpdateTaskNoInfo(t *testing.T) {
 	responseBody, _ := io.ReadAll(recorder.Body)
 	assert.Equal(t, http.StatusBadRequest, recorder.Code, fmt.Sprintf("Unexpected status code: %d", recorder.Code))
 	assert.Equal(t, expectedResponse, string(responseBody), "Invalid response pattern")
+}
+
+func TestUpdateTaskEmptyBody(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	context, _ := gin.CreateTestContext(w)
+	context.Params = []gin.Param{{Key: "taskId", Value: "1"}}
+	context.Request = httptest.NewRequest(http.MethodPut, "/tasks/1", bytes.NewBufferString("{}"))
+	context.Request.Header.Set("Content-Type", "application/json")
+
+	// Call the handler
+	updateTask(context)
+
+	// Validate response
+	expectedResponse := "{\"error\":\"at least one field must be present: 'title', 'description', 'priority', 'status, 'due_date'\"}"
+	responseBody, _ := io.ReadAll(w.Body)
+	assert.Equal(t, http.StatusBadRequest, w.Code, fmt.Sprintf("Unexpected status code: %d", w.Code))
+	assert.JSONEq(t, expectedResponse, string(responseBody), "Invalid response pattern")
 }

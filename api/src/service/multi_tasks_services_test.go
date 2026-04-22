@@ -69,7 +69,7 @@ func TestGetTasksList(t *testing.T) {
 	taskList, err := GetTasksList(filterConfig, pageConfig)
 
 	// Assertions
-	expectedOutput := []taskInfo{
+	expectedOutput := []TaskInfo{
 		0: {taskList[0].Id, taskList[0].Title, taskList[0].Status, taskList[0].Priority, taskList[0].Description, taskList[0].CreatedAt, taskList[0].DueDate},
 		1: {taskList[1].Id, taskList[1].Title, taskList[1].Status, taskList[1].Priority, taskList[1].Description, taskList[1].CreatedAt, taskList[1].DueDate},
 		2: {taskList[2].Id, taskList[2].Title, taskList[2].Status, taskList[2].Priority, taskList[2].Description, taskList[2].CreatedAt, taskList[2].DueDate},

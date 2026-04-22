@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -305,5 +306,24 @@ func TestGetAmountOfTasks(t *testing.T) {
 	assert.NoError(t, err, fmt.Sprintf("Unexpected error from function - err: %v", err))
 	assert.Equal(t, uint(3), tasksAmount, "Returned wrong tasks amount")
 	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
+}
 
+func TestQueryTasksDBError(t *testing.T) {
+	mockConn := setMockConnection()
+	defer mockConn.Close()
+
+	pagConfig := TasksPaginationQuery{Offset: 0, SortBy: "id", SortOrder: "ASC", Limit: 10}
+	filterConfig := []TasksFilterQuery{}
+
+	expectedQuery := "SELECT \\* FROM tasks ORDER BY id ASC LIMIT \\$1 OFFSET \\$2;"
+
+	mockConn.ExpectQuery(expectedQuery).
+		WithArgs(pagConfig.Limit, pagConfig.Offset).
+		WillReturnError(errors.New("connection error"))
+
+	tasks, err := QueryTasks(filterConfig, pagConfig)
+
+	assert.Error(t, err, "Expected error from DB failure")
+	assert.Empty(t, tasks, "Should return empty list on DB error")
+	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
 }

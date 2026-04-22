@@ -9,7 +9,7 @@ import (
 
 var defaultPageConfig models.TasksPaginationQuery = models.TasksPaginationQuery{Offset: 0, SortBy: "id", SortOrder: "ASC", Limit: 10}
 
-type taskInfo struct {
+type TaskInfo struct {
 	Id          uint   `json:"id"`
 	Title       string `json:"title"`
 	Status      string `json:"status"`
@@ -117,13 +117,13 @@ func appendFilter(filterCriteria []models.TasksFilterQuery, filterType string, f
 	return filterCriteria
 }
 
-func GetTasksList(filterConfig []models.TasksFilterQuery, pageConfig models.TasksPaginationQuery) ([]taskInfo, error) {
-	orderedTasks := []taskInfo{}
+func GetTasksList(filterConfig []models.TasksFilterQuery, pageConfig models.TasksPaginationQuery) ([]TaskInfo, error) {
+	orderedTasks := []TaskInfo{}
 
 	queriedTasks, err := models.QueryTasks(filterConfig, pageConfig)
 
 	for taskIdx, task := range queriedTasks {
-		newTask := taskInfo{
+		newTask := TaskInfo{
 			Id:          task.Id,
 			Title:       task.Title,
 			Status:      task.Status,

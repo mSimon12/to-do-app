@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -182,5 +183,59 @@ func TestDeleteInvalidTask(t *testing.T) {
 
 	// Assertions
 	assert.NoError(t, err, fmt.Sprintf("Unexpected error from function - err: %v", err))
+	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
+}
+
+func TestCheckExistenceFound(t *testing.T) {
+	mockConn := setMockConnection()
+	defer mockConn.Close()
+
+	taskId := uint(1)
+	expectedQuery := "SELECT EXISTS\\(SELECT \\* from tasks WHERE id=\\$1\\);"
+
+	mockConn.ExpectQuery(expectedQuery).
+		WithArgs(taskId).
+		WillReturnRows(pgxmock.NewRows([]string{"exists"}).AddRow(true))
+
+	exists, err := CheckExistence(taskId)
+
+	assert.NoError(t, err, fmt.Sprintf("Unexpected error from function - err: %v", err))
+	assert.True(t, exists, "Task should exist")
+	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
+}
+
+func TestCheckExistenceNotFound(t *testing.T) {
+	mockConn := setMockConnection()
+	defer mockConn.Close()
+
+	taskId := uint(99)
+	expectedQuery := "SELECT EXISTS\\(SELECT \\* from tasks WHERE id=\\$1\\);"
+
+	mockConn.ExpectQuery(expectedQuery).
+		WithArgs(taskId).
+		WillReturnRows(pgxmock.NewRows([]string{"exists"}).AddRow(false))
+
+	exists, err := CheckExistence(taskId)
+
+	assert.NoError(t, err, fmt.Sprintf("Unexpected error from function - err: %v", err))
+	assert.False(t, exists, "Task should not exist")
+	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
+}
+
+func TestCheckExistenceDBError(t *testing.T) {
+	mockConn := setMockConnection()
+	defer mockConn.Close()
+
+	taskId := uint(1)
+	expectedQuery := "SELECT EXISTS\\(SELECT \\* from tasks WHERE id=\\$1\\);"
+
+	mockConn.ExpectQuery(expectedQuery).
+		WithArgs(taskId).
+		WillReturnError(errors.New("connection error"))
+
+	exists, err := CheckExistence(taskId)
+
+	assert.Error(t, err, "Expected error from DB failure")
+	assert.False(t, exists, "Should return false on DB error")
 	assert.NoError(t, mockConn.ExpectationsWereMet(), "Expectations from SQL not met!")
 }
