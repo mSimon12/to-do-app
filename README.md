@@ -35,6 +35,8 @@ This application is composed of two services:
 - 📖 Auto-generated API documentation endpoint
 - 🧪 Unit testing and basic CI setup
 
+https://github.com/user-attachments/assets/edceeefa-1854-472f-b278-281d9d386b18
+
 ---
 
 ## ⚙️ Getting Started
